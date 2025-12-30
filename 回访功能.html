@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>居家长护协助申请系统</title>
+    <style>
+        /* 全局样式优化 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2f80ed;
+            --secondary-color: #ff7a45;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --danger-color: #ff4d4f;
+            --gray-color: #f5f7fa;
+            --text-color: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --border-color: #eee;
+            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            background-color: var(--gray-color);
+            font-size: 14px;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        
+        /* 顶部导航栏优化 */
+        .nav-bar {
+            height: 48px;
+            line-height: 48px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-back {
+            font-size: 20px;
+            cursor: pointer;
+            width: 48px;
+            text-align: center;
+        }
+        
+        .nav-title {
+            font-weight: 500;
+        }
+        
+        .nav-action {
+            font-size: 15px;
+            cursor: pointer;
+            width: 48px;
+            text-align: center;
+        }
+        
+        /* 类型切换栏优化 */
+        .type-tab {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 998;
+        }
+        
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        .tab-item.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 6px;
+            right: 20%;
+            background-color: var(--secondary-color);
+            color: #fff;
+            font-size: 11px;
+            padding: 1px 6px;
+            border-radius: 12px;
+            min-width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        /* 搜索栏优化 */
+        .search-bar {
+            position: fixed;
+            top: 97px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 997;
+            display: none;
+        }
+        
+        .search-bar.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .search-input {
+            width: 100%;
+            height: 38px;
+            padding: 0 16px;
+            border: 1px solid #ddd;
+            border-radius: 19px;
+            font-size: 14px;
+            background-color: #f8f8f8;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        /* 内容容器优化 */
+        .content {
+            padding: 140px 16px 80px;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        
+        /* 列表样式优化 */
+        .list-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title::after {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--primary-color);
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .list-empty {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #e0e0e0;
+        }
+        
+        /* 列表项优化 */
+        .list-item {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .list-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .item-name {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .item-nurse {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background-color: #f0f7ff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #e6f4ff;
+        }
+        
+        .item-row {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .item-label {
+            width: 65px;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
+        
+        .item-value {
+            color: var(--text-color);
+            flex: 1;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        
+        .item-btn {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .item-btn:hover {
+            background-color: #1e70d8;
+        }
+        
+        .view-btn {
+            background-color: #666;
+        }
+        
+        .view-btn:hover {
+            background-color: #555;
+        }
+        
+        /* 表单页面样式优化 */
+        .form-page {
+            display: none;
+        }
+        
+        .form-page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .form-header {
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text-color);
+        }
+        
+        /* 表单区域优化 */
+        .form-section {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: var(--primary-color);
+            margin-right: 8px;
+            border-radius: 1px;
+        }
+        
+        .required-mark {
+            color: var(--danger-color);
+            margin-left: 6px;
+            font-size: 12px;
+        }
+        
+        .form-item {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+        
+        .form-label {
+            width: 85px;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding-top: 8px;
+        }
+        
+        .form-content {
+            flex: 1;
+        }
+        
+        .readonly-text {
+            padding: 8px 0;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+        
+        /* 满意度选择优化 */
+        .satisfaction-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-textarea:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .form-tip {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+        }
+        
+        /* 满意度单选按钮样式 */
+        .satisfaction-radio {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .satisfaction-radio input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .satisfaction-radio span {
+            color: #333;
+        }
+        
+        /* 复选框组样式 */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item span {
+            color: #333;
+        }
+        
+        /* 其他选项输入框 */
+        .other-input-container {
+            margin-top: 8px;
+            margin-left: 26px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        /* 上传区域优化 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: #f8fbff;
+        }
+        
+        .upload-icon {
+            font-size: 36px;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+        
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .preview-item {
+            width: 88px;
+            height: 88px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-time {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 10px;
+            padding: 3px;
+            text-align: center;
+        }
+        
+        /* 底部按钮栏优化 */
+        .btn-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            z-index: 998;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            flex: 1;
+            margin: 0 6px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .btn-cancel {
+            background-color: #f5f5f5;
+            color: var(--text-secondary);
+        }
+        
+        .btn-cancel:hover {
+            background-color: #eee;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        
+        .btn-submit:hover {
+            background-color: #1e70d8;
+        }
+        
+        .btn-submit.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        /* 详情页面优化 */
+        .detail-item {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-label {
+            width: 85px;
+            flex-shrink: 0;
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+        
+        .satisfaction-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .tag-very-satisfied {
+            background-color: var(--success-color);
+        }
+        
+        .tag-satisfied {
+            background-color: var(--primary-color);
+        }
+        
+        .tag-average {
+            background-color: var(--warning-color);
+        }
+        
+        .tag-dissatisfied {
+            background-color: var(--danger-color);
+        }
+        
+        .photo-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .photo-item {
+            width: 108px;
+            height: 108px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 提示框优化 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 动画效果 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* 协助申请首页样式 */
+        .home-page {
+            padding-top: 50px;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, #2f80ed 0%, #5294ff 100%);
+            color: #fff;
+            padding: 20px 16px;
+            border-radius: 0 0 20px 20px;
+            text-align: center;
+        }
+        
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .user-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .user-role {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px 16px;
+        }
+        
+        .menu-item {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .menu-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+        }
+        
+        .menu-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        /* 协助申请列表页面样式 */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            padding: 6px 12px;
+            background-color: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        
+        .filter-item.active {
+            background-color: #f0f7ff;
+            color: var(--primary-color);
+            border-color: #e6f4ff;
+        }
+        
+        /* 协助申请表单页面样式 */
+        .form-select {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .form-checkbox {
+            margin-right: 8px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-bar">
+        <div class="nav-back" onclick="goBack()">←</div>
+        <div class="nav-title">回访管理</div>
+        <div class="nav-action" onclick="toggleSearch()">筛选</div>
+    </div>
+
+    <!-- 类型切换 -->
+    <div class="type-tab">
+        <div class="tab-item active" id="pendingTab" onclick="switchTab('pending')">
+            待回访
+            <span class="badge" id="pendingCount">3</span>
+        </div>
+        <div class="tab-item" id="completedTab" onclick="switchTab('completed')">已回访</div>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div class="search-bar" id="searchBar">
+        <input type="text" class="search-input" id="searchInput" placeholder="按护理员姓名搜索" oninput="searchItems()">
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 待回访列表页面 -->
+        <div id="pendingListPage">
+            <div class="list-title">待回访服务对象</div>
+            
+            <!-- 列表项 -->
+            <div class="list-item" data-id="1" data-name="张三" data-address="庐阳区XX街道XX社区" 
+                 data-phone="13800138000" data-nurse="李护理员" data-level="重度失能（三级）">
+                <div class="item-header">
+                    <div class="item-name">张三</div>
+                    <div class="item-nurse">李护理员</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">失能等级：</div>
+                    <div class="item-value">重度失能（三级）</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">地址：</div>
+                    <div class="item-value" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市庐阳区XX街道XX社区</span>
+                        <button onclick="openVisitNavigation('安徽省合肥市庐阳区XX街道XX社区')" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">电话：</div>
+                    <div class="item-value" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13800138000</span>
+                        <a href="tel:13800138000" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="item-footer">
+                    <button class="item-btn" onclick="startVisit('1', '张三', '庐阳区XX街道XX社区', '13800138000', '李护理员', '重度失能（三级）')">去回访</button>
+                </div>
+            </div>
+            
+            <div class="list-item" data-id="2" data-name="李四" data-address="包河区XX街道XX社区" 
+                 data-phone="13900139000" data-nurse="王护理员" data-level="中度失能（二级）">
+                <div class="item-header">
+                    <div class="item-name">李四</div>
+                    <div class="item-nurse">王护理员</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">失能等级：</div>
+                    <div class="item-value">中度失能（二级）</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">地址：</div>
+                    <div class="item-value" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市包河区XX街道XX社区</span>
+                        <button onclick="openVisitNavigation('安徽省合肥市包河区XX街道XX社区')" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">电话：</div>
+                    <div class="item-value" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13900139000</span>
+                        <a href="tel:13900139000" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="item-footer">
+                    <button class="item-btn" onclick="startVisit('2', '李四', '包河区XX街道XX社区', '13900139000', '王护理员', '中度失能（二级）')">去回访</button>
+                </div>
+            </div>
+            
+            <div class="list-item" data-id="3" data-name="王五" data-address="蜀山区XX街道XX社区" 
+                 data-phone="13700137000" data-nurse="李护理员" data-level="轻度失能（一级）">
+                <div class="item-header">
+                    <div class="item-name">王五</div>
+                    <div class="item-nurse">李护理员</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">失能等级：</div>
+                    <div class="item-value">轻度失能（一级）</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">地址：</div>
+                    <div class="item-value" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市蜀山区XX街道XX社区</span>
+                        <button onclick="openVisitNavigation('安徽省合肥市蜀山区XX街道XX社区')" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">电话：</div>
+                    <div class="item-value" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13700137000</span>
+                        <a href="tel:13700137000" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="item-footer">
+                    <button class="item-btn" onclick="startVisit('3', '王五', '蜀山区XX街道XX社区', '13700137000', '李护理员', '轻度失能（一级）')">去回访</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 已回访列表页面 -->
+        <div id="completedListPage" style="display: none;">
+            <div class="list-title">已回访服务对象</div>
+            
+            <!-- 列表项 -->
+            <div class="list-item" data-id="4" data-name="赵六" data-address="瑶海区XX街道XX社区" 
+                 data-phone="13600136000" data-nurse="张护理员">
+                <div class="item-header">
+                    <div class="item-name">赵六</div>
+                    <div class="item-nurse">张护理员</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">地址：</div>
+                    <div class="item-value">安徽省合肥市瑶海区XX街道XX社区</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">回访时间：</div>
+                    <div class="item-value">2025-11-20</div>
+                </div>
+                <div class="item-footer">
+                    <button class="item-btn view-btn" onclick="viewVisit('4')">查看详情</button>
+                </div>
+            </div>
+            
+            <div class="list-item" data-id="5" data-name="孙七" data-address="经开区XX街道XX社区" 
+                 data-phone="13500135000" data-nurse="王护理员">
+                <div class="item-header">
+                    <div class="item-name">孙七</div>
+                    <div class="item-nurse">王护理员</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">地址：</div>
+                    <div class="item-value">安徽省合肥市经开区XX街道XX社区</div>
+                </div>
+                <div class="item-row">
+                    <div class="item-label">回访时间：</div>
+                    <div class="item-value">2025-11-19</div>
+                </div>
+                <div class="item-footer">
+                    <button class="item-btn view-btn" onclick="viewVisit('5')">查看详情</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 回访记录页面 -->
+        <div id="visitFormPage" class="form-page">
+            <div class="form-header">回访记录 - <span id="visitUserName">张三</span></div>
+            
+            <!-- 回访基本信息 -->
+            <div class="form-section">
+                <div class="section-title">基本信息</div>
+                <div class="form-item">
+                    <div class="form-label">回访日期：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitDate">2025-11-28</div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">服务对象：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitName">张三</div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">护理员：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitNurse">李护理员</div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">失能等级：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitLevel">重度失能（三级）</div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">联系电话：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitPhone" style="display: flex; align-items: center; gap: 8px;">
+                            <span>13800138000</span>
+                            <a href="tel:13800138000" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">服务地址：</div>
+                    <div class="form-content">
+                        <div class="readonly-text" id="visitAddress" style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>安徽省合肥市庐阳区XX街道XX社区</span>
+                            <button onclick="openVisitNavigationFromForm()" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 回访记录信息 -->
+            <div class="form-section">
+                <div class="section-title">回访记录 <span class="required-mark">*</span></div>
+                
+                <div class="form-item">
+                    <div class="form-label">满意度 <span class="required-mark">*</span></div>
+                    <div class="form-content">
+                        <div class="satisfaction-group">
+                            <label class="satisfaction-radio">
+                                <input type="radio" name="satisfaction" value="satisfied" onchange="selectSatisfaction('satisfied')">
+                                <span>满意</span>
+                            </label>
+                            <label class="satisfaction-radio">
+                                <input type="radio" name="satisfaction" value="average" onchange="selectSatisfaction('average')">
+                                <span>一般</span>
+                            </label>
+                            <label class="satisfaction-radio">
+                                <input type="radio" name="satisfaction" value="dissatisfied" onchange="selectSatisfaction('dissatisfied')">
+                                <span>不满意</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-item">
+                    <div class="form-label">服务对象要求：</div>
+                    <div class="form-content">
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="time-arrangement" onchange="updateServiceRequirement()">
+                                <span>时间安排需改进</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="service-duration" onchange="updateServiceRequirement()">
+                                <span>服务时长需改进</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="service-items" onchange="updateServiceRequirement()">
+                                <span>服务项目需调整</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="designated-caregiver" onchange="updateServiceRequirement()">
+                                <span>需要指定的护理员</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="no-frequent-change" onchange="updateServiceRequirement()">
+                                <span>不愿频繁更换护理员</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="serviceRequirement" value="other" onchange="updateServiceRequirement()">
+                                <span>其他</span>
+                            </label>
+                            <div id="otherRequirementInput" class="other-input-container" style="display: none;">
+                                <input type="text" class="form-input" id="otherRequirementText" placeholder="请输入其他要求" maxlength="200">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 现场情况描述 -->
+                <div class="form-item">
+                    <div class="form-label">现场情况描述 <span class="required-mark">*</span>：</div>
+                    <div class="form-content">
+                        <textarea class="form-textarea" id="sceneDescription" placeholder="请描述现场情况" rows="4" maxlength="500" oninput="checkFormValidation()"></textarea>
+                        <div class="form-tip">最多500字</div>
+                    </div>
+                </div>
+                
+                <!-- 现场照片上传 -->
+                <div class="form-item">
+                    <div class="form-label">现场照片：</div>
+                    <div class="form-content">
+                        <div class="upload-area" onclick="selectImage()">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">点击拍摄现场照片（最多3张）</div>
+                        </div>
+                        <div class="preview-container" id="photoPreview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 回访详情页面 -->
+        <div id="visitDetailPage" class="form-page">
+            <div class="form-header">回访详情 - <span id="detailUserName">赵六</span></div>
+            
+            <!-- 回访基本信息 -->
+            <div class="form-section">
+                <div class="section-title">基本信息</div>
+                <div class="detail-item">
+                    <div class="detail-label">回访日期：</div>
+                    <div class="detail-value">2025-11-20</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">服务对象：</div>
+                    <div class="detail-value">赵六</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">护理员：</div>
+                    <div class="detail-value">张护理员</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">联系电话：</div>
+                    <div class="detail-value">13600136000</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">地址：</div>
+                    <div class="detail-value">安徽省合肥市瑶海区XX街道XX社区</div>
+                </div>
+            </div>
+            
+            <!-- 回访记录信息 -->
+            <div class="form-section">
+                <div class="section-title">回访记录</div>
+                <div class="detail-item">
+                    <div class="detail-label">满意度：</div>
+                    <div class="detail-value">
+                        <span class="satisfaction-tag tag-very-satisfied">满意</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">服务对象要求：</div>
+                    <div class="detail-value">希望增加康复训练的时间，调整护理计划。</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">现场检查情况描述：</div>
+                    <div class="detail-value">护理环境整洁，设备齐全，护理员操作规范，服务对象状态良好。</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">现场照片：</div>
+                    <div class="detail-value">
+                        <div class="photo-list">
+                            <div class="photo-item">
+                                <img src="https://via.placeholder.com/100" class="photo-img">
+                            </div>
+                            <div class="photo-item">
+                                <img src="https://via.placeholder.com/100" class="photo-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮栏 -->
+    <div class="btn-bar" id="listBtnBar">
+        <button class="nav-btn btn-cancel" onclick="goBack()">返回</button>
+    </div>
+    
+    <div class="btn-bar" id="formBtnBar" style="display: none;">
+        <button class="nav-btn btn-cancel" onclick="cancelVisit()">取消</button>
+        <button class="nav-btn btn-submit disabled" id="submitBtn" onclick="submitVisit()">提交回访</button>
+    </div>
+    
+    <div class="btn-bar" id="detailBtnBar" style="display: none;">
+        <button class="nav-btn btn-submit" onclick="backToList()">返回列表</button>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        let currentTab = 'pending';
+        let currentVisit = {
+            id: '',
+            name: '',
+            address: '',
+            phone: '',
+            nurse: '',
+            satisfaction: ''
+        };
+        
+        let uploadedPhotos = [];
+        
+        // 初始化日期
+        window.onload = function() {
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' + 
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(today.getDate()).padStart(2, '0');
+            document.getElementById('visitDate').textContent = dateStr;
+        };
+        
+        // 切换标签页
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 更新标签状态
+            document.getElementById('pendingTab').classList.remove('active');
+            document.getElementById('completedTab').classList.remove('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            // 切换列表页面
+            document.getElementById('pendingListPage').style.display = tab === 'pending' ? 'block' : 'none';
+            document.getElementById('completedListPage').style.display = tab === 'completed' ? 'block' : 'none';
+            
+            // 显示列表按钮栏
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('formBtnBar').style.display = 'none';
+            document.getElementById('detailBtnBar').style.display = 'none';
+            document.getElementById('visitFormPage').classList.remove('active');
+            document.getElementById('visitDetailPage').classList.remove('active');
+            
+            // 隐藏搜索栏
+            document.getElementById('searchBar').classList.remove('show');
+        }
+        
+        // 切换搜索栏显示
+        function toggleSearch() {
+            document.getElementById('searchBar').classList.toggle('show');
+            // 显示时自动聚焦
+            if (document.getElementById('searchBar').classList.contains('show')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+        
+        // 搜索功能
+        function searchItems() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (currentTab === 'pending') {
+                const items = document.querySelectorAll('#pendingListPage .list-item');
+                items.forEach(item => {
+                    const nurse = item.dataset.nurse.toLowerCase();
+                    item.style.display = nurse.includes(searchText) ? 'block' : 'none';
+                });
+            } else {
+                const items = document.querySelectorAll('#completedListPage .list-item');
+                items.forEach(item => {
+                    const nurse = item.dataset.nurse.toLowerCase();
+                    item.style.display = nurse.includes(searchText) ? 'block' : 'none';
+                });
+            }
+        }
+        
+        // 打开回访导航
+        function openVisitNavigation(address) {
+            if (!address) {
+                showToast('地址信息不完整');
+                return;
+            }
+            
+            const amapUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(address)}&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1`;
+            const amapLink = document.createElement('a');
+            amapLink.href = amapUrl;
+            amapLink.target = '_blank';
+            amapLink.click();
+            
+            setTimeout(() => {
+                const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(address)}&mode=driving&region=全国&output=html&src=webapp`;
+                window.open(baiduUrl, '_blank');
+            }, 500);
+            
+            showToast(`正在打开地图导航...`);
+        }
+        
+        // 开始回访
+        function startVisit(id, name, address, phone, nurse, level) {
+            currentVisit.id = id;
+            currentVisit.name = name;
+            currentVisit.address = address;
+            currentVisit.phone = phone;
+            currentVisit.nurse = nurse;
+            currentVisit.level = level || '';
+            currentVisit.satisfaction = '';
+            
+            // 重置上传照片
+            uploadedPhotos = [];
+            
+            // 更新页面信息
+            document.getElementById('visitUserName').textContent = name;
+            document.getElementById('visitName').textContent = name;
+            document.getElementById('visitNurse').textContent = nurse;
+            document.getElementById('visitLevel').textContent = currentVisit.level || '未填写';
+            // 更新电话显示
+            const phoneElement = document.getElementById('visitPhone');
+            phoneElement.innerHTML = `
+                <span>${phone}</span>
+                <a href="tel:${phone}" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>
+            `;
+            // 更新地址显示
+            const addressElement = document.getElementById('visitAddress');
+            const fullAddress = `安徽省合肥市${address}`;
+            addressElement.innerHTML = `
+                <span>${fullAddress}</span>
+                <button onclick="openVisitNavigationFromForm()" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>
+            `;
+            document.getElementById('photoPreview').innerHTML = '';
+            
+            // 重置满意度选择
+            document.querySelectorAll('input[name="satisfaction"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 重置服务对象要求复选框
+            document.querySelectorAll('input[name="serviceRequirement"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 隐藏并清空"其他"输入框
+            const otherInputContainer = document.getElementById('otherRequirementInput');
+            const otherInput = document.getElementById('otherRequirementText');
+            if (otherInputContainer) {
+                otherInputContainer.style.display = 'none';
+            }
+            if (otherInput) {
+                otherInput.value = '';
+            }
+            
+            // 清空现场情况描述
+            const sceneDescription = document.getElementById('sceneDescription');
+            if (sceneDescription) {
+                sceneDescription.value = '';
+            }
+            
+            // 禁用提交按钮
+            document.getElementById('submitBtn').classList.add('disabled');
+            
+            // 切换页面
+            document.getElementById('pendingListPage').style.display = 'none';
+            document.getElementById('visitFormPage').classList.add('active');
+            document.getElementById('listBtnBar').style.display = 'none';
+            document.getElementById('formBtnBar').style.display = 'flex';
+        }
+        
+        // 取消回访
+        function cancelVisit() {
+            if (confirm('确定要取消回访记录吗？已填写的内容将不会保存。')) {
+                document.getElementById('visitFormPage').classList.remove('active');
+                document.getElementById('pendingListPage').style.display = 'block';
+                document.getElementById('listBtnBar').style.display = 'flex';
+                document.getElementById('formBtnBar').style.display = 'none';
+            }
+        }
+        
+        // 选择满意度
+        function selectSatisfaction(type) {
+            // 记录满意度
+            currentVisit.satisfaction = type;
+            
+            // 检查表单是否完整
+            checkFormValidation();
+        }
+        
+        // 检查表单验证
+        function checkFormValidation() {
+            const satisfaction = currentVisit.satisfaction;
+            const sceneDescription = document.getElementById('sceneDescription').value.trim();
+            
+            // 如果满意度和现场情况描述都已填写，启用提交按钮
+            if (satisfaction && sceneDescription) {
+                document.getElementById('submitBtn').classList.remove('disabled');
+            } else {
+                document.getElementById('submitBtn').classList.add('disabled');
+            }
+        }
+        
+        // 更新服务对象要求
+        function updateServiceRequirement() {
+            // 检查"其他"复选框是否被选中
+            const otherCheckbox = document.querySelector('input[name="serviceRequirement"][value="other"]');
+            const otherInputContainer = document.getElementById('otherRequirementInput');
+            const otherInput = document.getElementById('otherRequirementText');
+            
+            if (otherCheckbox && otherCheckbox.checked) {
+                // 显示输入框
+                otherInputContainer.style.display = 'block';
+                // 聚焦输入框
+                setTimeout(() => {
+                    otherInput.focus();
+                }, 100);
+            } else {
+                // 隐藏输入框并清空内容
+                otherInputContainer.style.display = 'none';
+                if (otherInput) {
+                    otherInput.value = '';
+                }
+            }
+        }
+        
+        // 选择图片
+        function selectImage() {
+            if (uploadedPhotos.length >= 3) {
+                showToast('最多只能上传3张照片');
+                return;
+            }
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'camera';
+            input.multiple = false;
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // 图片大小限制（5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('图片大小不能超过5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const now = new Date();
+                    const timeStr = now.getFullYear() + '-' + 
+                                   String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                                   String(now.getDate()).padStart(2, '0') + ' ' +
+                                   String(now.getHours()).padStart(2, '0') + ':' +
+                                   String(now.getMinutes()).padStart(2, '0');
+                    
+                    // 保存照片信息
+                    uploadedPhotos.push({
+                        id: Date.now(),
+                        url: event.target.result,
+                        time: timeStr
+                    });
+                    
+                    // 更新预览
+                    renderPhotoPreview();
+                };
+                
+                reader.readAsDataURL(file);
+            };
+            
+            input.click();
+        }
+        
+        // 渲染照片预览
+        function renderPhotoPreview() {
+            const container = document.getElementById('photoPreview');
+            container.innerHTML = '';
+            
+            uploadedPhotos.forEach((photo, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${photo.url}" class="preview-img">
+                    <div class="preview-time">${photo.time}</div>
+                `;
+                container.appendChild(previewItem);
+            });
+        }
+        
+        // 提交回访记录
+        function submitVisit() {
+            if (!currentVisit.satisfaction) {
+                showToast('请选择满意度');
+                return;
+            }
+            
+            // 验证现场情况描述（必填）
+            const sceneDescription = document.getElementById('sceneDescription').value.trim();
+            if (!sceneDescription) {
+                showToast('请填写现场情况描述');
+                return;
+            }
+            
+            // 获取服务对象要求（复选框）
+            const checkedRequirements = Array.from(document.querySelectorAll('input[name="serviceRequirement"]:checked'))
+                .map(checkbox => {
+                    const labels = {
+                        'time-arrangement': '时间安排需改进',
+                        'service-duration': '服务时长需改进',
+                        'service-items': '服务项目需调整',
+                        'designated-caregiver': '需要指定的护理员',
+                        'no-frequent-change': '不愿频繁更换护理员',
+                        'other': '其他'
+                    };
+                    let label = labels[checkbox.value] || checkbox.value;
+                    
+                    // 如果选择了"其他"，检查是否有输入内容
+                    if (checkbox.value === 'other') {
+                        const otherText = document.getElementById('otherRequirementText').value.trim();
+                        if (otherText) {
+                            label = '其他：' + otherText;
+                        }
+                    }
+                    
+                    return label;
+                });
+            const serviceRequirement = checkedRequirements.join('、');
+            
+            // 模拟提交数据
+            const visitData = {
+                id: currentVisit.id,
+                name: currentVisit.name,
+                date: document.getElementById('visitDate').textContent,
+                satisfaction: currentVisit.satisfaction,
+                serviceRequirement: serviceRequirement,
+                sceneDescription: sceneDescription,
+                photos: uploadedPhotos.length,
+                submitTime: new Date().toLocaleString()
+            };
+            
+            // 模拟提交成功
+            showToast('回访记录提交成功');
+            
+            // 返回待回访列表，并更新计数
+            setTimeout(() => {
+                document.getElementById('visitFormPage').classList.remove('active');
+                document.getElementById('pendingListPage').style.display = 'block';
+                document.getElementById('listBtnBar').style.display = 'flex';
+                document.getElementById('formBtnBar').style.display = 'none';
+                
+                // 更新待回访数量
+                const pendingCount = document.getElementById('pendingCount');
+                const currentCount = parseInt(pendingCount.textContent);
+                if (currentCount > 0) {
+                    pendingCount.textContent = currentCount - 1;
+                }
+                
+                // 移除已回访的项目
+                const item = document.querySelector(`.list-item[data-id="${currentVisit.id}"]`);
+                if (item) {
+                    item.remove();
+                    
+                    // 如果待回访列表为空，显示空状态
+                    const pendingItems = document.querySelectorAll('#pendingListPage .list-item');
+                    if (pendingItems.length === 0) {
+                        document.getElementById('pendingListPage').innerHTML = `
+                            <div class="list-empty">
+                                <div class="empty-icon">📋</div>
+                                <div>暂无待回访服务对象</div>
+                            </div>
+                        `;
+                    }
+                }
+            }, 1500);
+        }
+        
+        // 查看回访详情
+        function viewVisit(id) {
+            // 模拟加载详情数据
+            document.getElementById('detailUserName').textContent = id === '4' ? '赵六' : '孙七';
+            
+            // 切换页面
+            document.getElementById('completedListPage').style.display = 'none';
+            document.getElementById('visitDetailPage').classList.add('active');
+            document.getElementById('listBtnBar').style.display = 'none';
+            document.getElementById('detailBtnBar').style.display = 'flex';
+        }
+        
+        // 返回列表
+        function backToList() {
+            document.getElementById('visitDetailPage').classList.remove('active');
+            document.getElementById('completedListPage').style.display = 'block';
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('detailBtnBar').style.display = 'none';
+        }
+        
+        // 返回主页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // 从回访表单打开导航
+        function openVisitNavigationFromForm() {
+            if (currentVisit.address) {
+                const fullAddress = `安徽省合肥市${currentVisit.address}`;
+                openVisitNavigation(fullAddress);
+            } else {
+                showToast('地址信息不完整');
+            }
+        }
+        
+        // 显示提示框
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // 键盘事件处理
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('searchBar').classList.contains('show')) {
+                    toggleSearch();
+                } else if (document.getElementById('visitFormPage').classList.contains('active')) {
+                    cancelVisit();
+                } else if (document.getElementById('visitDetailPage').classList.contains('active')) {
+                    backToList();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

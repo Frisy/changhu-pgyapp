@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>居家长护协助申请系统 - 现场协助申请登记</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2f80ed;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --danger-color: #ff4d4f;
+            --text-color: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --border-color: #ddd;
+            --bg-color: #f5f7fa;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-size: 14px;
+            color: var(--text-color);
+            padding-bottom: 70px;
+        }
+        
+        /* 顶部导航栏 */
+        .nav-bar {
+            height: 44px;
+            line-height: 44px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+        
+        .nav-back {
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* 内容容器 */
+        .content {
+            padding: 54px 15px 15px;
+        }
+        
+        /* 表单区域 */
+        .form-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: var(--primary-color);
+            margin-right: 8px;
+            border-radius: 1px;
+        }
+        
+        .form-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        
+        .form-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            width: 90px;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: var(--text-color);
+            padding-top: 10px;
+            font-weight: 500;
+        }
+        
+        .form-label.required::after {
+            content: '*';
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+        
+        .form-content {
+            flex: 1;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.1);
+        }
+        
+        .form-input {
+            height: 40px;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-input:read-only {
+            background-color: #f5f7fa;
+            color: var(--text-secondary);
+        }
+        
+        /* 身份证识别按钮 */
+        .id-card-scan {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .scan-btn {
+            padding: 6px 12px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+        }
+        
+        .scan-btn:active {
+            opacity: 0.8;
+        }
+        
+        /* 单选和复选框组 */
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .radio-item, .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .radio-item input[type="radio"],
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .radio-item label,
+        .checkbox-item label {
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        
+        /* 地理位置区域 */
+        .location-section {
+            background-color: #f0f7ff;
+            border: 1px solid #b3d8ff;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .location-info {
+            margin-bottom: 10px;
+        }
+        
+        .location-item {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .location-item strong {
+            color: var(--text-color);
+            margin-right: 5px;
+        }
+        
+        .location-confirm {
+            padding: 8px 16px;
+            background-color: var(--success-color);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            margin-top: 10px;
+        }
+        
+        .location-confirm:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .location-confirmed {
+            color: var(--success-color);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        /* 文件上传区域 */
+        .upload-section {
+            margin-top: 15px;
+        }
+        
+        .upload-tips {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+        
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .upload-item {
+            position: relative;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            background-color: #fafafa;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .upload-item:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7ff;
+        }
+        
+        .upload-item.uploaded {
+            border: 1px solid var(--success-color);
+            background-color: #f6ffed;
+        }
+        
+        .upload-item-header {
+            padding: 8px;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color);
+            text-align: center;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-item-body {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: #fafafa;
+        }
+        
+        .upload-item.add-btn .upload-item-body::before {
+            content: '+';
+            font-size: 36px;
+            color: var(--primary-color);
+            font-weight: 300;
+        }
+        
+        .upload-item.add-btn .upload-item-body::after {
+            content: '点击上传';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        
+        .upload-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .upload-item .delete-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 77, 79, 0.9);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .upload-item .delete-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .upload-item .file-status {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            right: 4px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: #fff;
+            font-size: 10px;
+            padding: 4px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .upload-item .optional-tag {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background-color: rgba(250, 173, 20, 0.9);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            z-index: 10;
+        }
+        
+        .upload-item .yang-need-tag {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background-color: rgba(47, 128, 237, 0.9);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            z-index: 10;
+        }
+        
+        /* 档案材料分类 */
+        .archive-category {
+            margin-bottom: 20px;
+        }
+        
+        .category-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            padding-left: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .category-tips {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+            padding-left: 8px;
+        }
+        
+        /* 底部按钮栏 */
+        .btn-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            z-index: 998;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-cancel {
+            background-color: #f5f5f5;
+            color: var(--text-secondary);
+        }
+        
+        .btn-cancel:active {
+            background-color: #e8e8e8;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        
+        .btn-submit:active {
+            background-color: #096dd9;
+        }
+        
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 隐藏的文件输入 */
+        .file-input {
+            display: none;
+        }
+        
+        /* 加载提示 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-tertiary);
+        }
+        
+        /* 列表页面样式 */
+        .list-page {
+            display: block;
+        }
+        
+        .list-page.hidden {
+            display: none;
+        }
+        
+        .form-page {
+            display: none;
+        }
+        
+        .form-page.show {
+            display: block;
+        }
+        
+        /* 筛选区域 */
+        .filter-bar {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            display: block;
+        }
+        
+        .filter-input, .filter-select {
+            width: 100%;
+            height: 34px;
+            padding: 0 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-reset {
+            background-color: #f5f5f5;
+            color: var(--text-secondary);
+        }
+        
+        /* 线索列表 */
+        .clue-list {
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .list-header {
+            display: flex;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+        
+        .list-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #f5f5f5;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .list-item:active {
+            background-color: #f0f0f0;
+        }
+        
+        .col-date {
+            width: 10%;
+            flex-shrink: 0;
+        }
+        
+        .col-name {
+            width: 8%;
+            flex-shrink: 0;
+        }
+        
+        .col-family {
+            width: 8%;
+            flex-shrink: 0;
+        }
+        
+        .col-community {
+            width: 12%;
+            flex-shrink: 0;
+        }
+        
+        .col-address {
+            width: 20%;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .col-phone {
+            width: 12%;
+            flex-shrink: 0;
+        }
+        
+        .col-source {
+            width: 10%;
+            flex-shrink: 0;
+        }
+        
+        .col-action {
+            width: 20%;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        
+        .select-btn {
+            padding: 6px 16px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .select-btn:active {
+            opacity: 0.8;
+        }
+        
+        /* 空数据提示 */
+        .empty-data {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+        
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-bar">
+        <div class="nav-back" onclick="goBack()">←</div>
+        <div id="pageTitle">选择服务对象</div>
+        <div></div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 列表页面 -->
+        <div id="listPage" class="list-page">
+            <!-- 筛选区域 -->
+            <div class="filter-bar">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label class="filter-label">日期</label>
+                        <input type="date" class="filter-input" id="filterDate" oninput="filterClues()">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">姓名</label>
+                        <input type="text" class="filter-input" id="filterName" placeholder="请输入" oninput="filterClues()">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">街道/乡镇</label>
+                        <select class="filter-select" id="filterStreet" onchange="onStreetChange()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">社区/村屯</label>
+                        <select class="filter-select" id="filterCommunity" onchange="onCommunityChange()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">小区/自然村</label>
+                        <select class="filter-select" id="filterCell" onchange="filterClues()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="filter-btn btn-reset" onclick="resetFilter()">重置</button>
+                </div>
+            </div>
+
+            <!-- 线索列表 -->
+            <div class="clue-list">
+                <div class="list-header">
+                    <div class="col-date">日期</div>
+                    <div class="col-name">姓名</div>
+                    <div class="col-family">失能等级</div>
+                    <div class="col-community">社区/村镇</div>
+                    <div class="col-address">详细地址</div>
+                    <div class="col-phone">联系电话</div>
+                    <div class="col-source">线索来源</div>
+                    <div class="col-action">操作</div>
+                </div>
+                <div id="clueListContainer">
+                    <!-- 列表数据通过JS动态生成 -->
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表单页面 -->
+        <div id="formPage" class="form-page">
+            <!-- 已选服务对象信息（只读显示） -->
+            <div class="form-section" id="selectedClueInfoSection" style="display: none;">
+                <div class="section-title">已选服务对象信息</div>
+                <div id="selectedClueInfo">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 服务对象信息 -->
+            <div class="form-section">
+            <div class="section-title">服务对象信息</div>
+            
+            <div class="form-item">
+                <div class="form-label required">姓名</div>
+                <div class="form-content">
+                    <input type="text" class="form-input" id="clientName" placeholder="请输入姓名">
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label required">性别</div>
+                <div class="form-content">
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="clientGender" id="clientGenderMale" value="男">
+                            <label for="clientGenderMale">男</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="clientGender" id="clientGenderFemale" value="女">
+                            <label for="clientGenderFemale">女</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label required">身份证号</div>
+                <div class="form-content">
+                    <div class="id-card-scan">
+                        <input type="text" class="form-input" id="clientIdCard" placeholder="请输入或扫描身份证">
+                        <button class="scan-btn" onclick="scanIdCard('client')">识别</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">户籍地址</div>
+                <div class="form-content">
+                    <input type="text" class="form-input" id="clientHukouAddress" placeholder="从身份证识别或手动输入">
+                </div>
+            </div>
+            
+            
+            <div class="form-item">
+                <div class="form-label required">联系电话</div>
+                <div class="form-content">
+                    <input type="tel" class="form-input" id="clientPhone" placeholder="请输入联系电话">
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label required">医保类型</div>
+                <div class="form-content">
+                    <select class="form-select" id="medicalInsuranceType">
+                        <option value="">请选择</option>
+                        <option value="城乡居民医保">城乡居民医保</option>
+                        <option value="职工医保">职工医保</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">残疾等级</div>
+                <div class="form-content">
+                    <select class="form-select" id="disabilityLevel">
+                        <option value="">请选择</option>
+                        <option value="一级">一级</option>
+                        <option value="二级">二级</option>
+                        <option value="三级">三级</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">是否低保户</div>
+                <div class="form-content">
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="isLowIncome" id="isLowIncomeYes" value="是">
+                            <label for="isLowIncomeYes">是</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="isLowIncome" id="isLowIncomeNo" value="否">
+                            <label for="isLowIncomeNo">否</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label required">失能原因</div>
+                <div class="form-content">
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="disabilityReason" id="reasonAging" value="年老">
+                            <label for="reasonAging">年老</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="disabilityReason" id="reasonDisease" value="疾病">
+                            <label for="reasonDisease">疾病</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="disabilityReason" id="reasonAccident" value="意外">
+                            <label for="reasonAccident">意外</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="disabilityReason" id="reasonOther" value="其他">
+                            <label for="reasonOther">其他</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">情况说明</div>
+                <div class="form-content">
+                    <textarea class="form-textarea" id="clientDescription" placeholder="文字描述服务对象的当前状态，用于评估通过后填写服务计划"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 家属信息 -->
+        <div class="form-section">
+            <div class="section-title">家属信息</div>
+            
+            <div class="form-item">
+                <div class="form-label">家属姓名</div>
+                <div class="form-content">
+                    <input type="text" class="form-input" id="familyName" placeholder="请输入家属姓名">
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">家属身份证号</div>
+                <div class="form-content">
+                    <div class="id-card-scan">
+                        <input type="text" class="form-input" id="familyIdCard" placeholder="请输入或扫描身份证">
+                        <button class="scan-btn" onclick="scanIdCard('family')">识别</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">家属联系电话</div>
+                <div class="form-content">
+                    <input type="tel" class="form-input" id="familyPhone" placeholder="请输入家属联系电话">
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <div class="form-label">关系</div>
+                <div class="form-content">
+                    <select class="form-input" id="familyRelation">
+                        <option value="">请选择关系</option>
+                        <option value="1">配偶</option>
+                        <option value="2">子女</option>
+                        <option value="3">亲戚</option>
+                        <option value="4">朋友</option>
+                        <option value="5">网格员</option>
+                        <option value="6">居委会</option>
+                        <option value="7">其他</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 地理位置信息 -->
+        <div class="form-section">
+            <div class="section-title">地理位置信息</div>
+            
+            <div class="location-section" id="locationSection">
+                <div class="location-info" id="locationInfo">
+                    <div class="location-item">
+                        <strong>经纬度：</strong>
+                        <span id="locationCoordinates">获取中...</span>
+                    </div>
+                    <div class="location-item">
+                        <strong>地点名称：</strong>
+                        <span id="locationName">获取中...</span>
+                    </div>
+                </div>
+                
+                <div class="form-item" style="margin-bottom: 10px;">
+                    <div class="form-label">地标相对位置</div>
+                    <div class="form-content">
+                        <input type="text" class="form-input" id="landmarkPosition" placeholder="如：距离XX超市50米路北">
+                    </div>
+                </div>
+                
+                <button class="location-confirm" id="confirmLocationBtn" onclick="confirmLocation()">确认定位信息</button>
+                <div class="location-confirmed" id="locationConfirmed" style="display: none;">
+                    ✓ 定位信息已确认，不可修改
+                </div>
+            </div>
+        </div>
+
+        <!-- 纸质材料上传 -->
+        <div class="form-section">
+            <div class="section-title">纸质材料上传</div>
+            <div class="upload-tips">最多上传10张图片，支持预览和删除重拍</div>
+            
+            <!-- 初评材料 (position=1) -->
+            <div class="archive-category">
+                <div class="category-title">初评材料 (position=1)</div>
+                <div class="category-tips">包括：本人身份证、代理人身份证、失能等级自评表、评估申请表、病情承诺书、病例或证明等</div>
+                <div class="upload-grid" id="archiveCategory1">
+                    <!-- 上传项将通过JS动态生成 -->
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- 底部按钮栏 - 列表页面 -->
+    <div class="btn-bar" id="listBtnBar">
+        <button class="btn btn-cancel" onclick="goBack()">返回</button>
+    </div>
+    
+    <!-- 底部按钮栏 - 表单页面 -->
+    <div class="btn-bar" id="formBtnBar" style="display: none;">
+        <button class="btn btn-cancel" onclick="goBack()">取消</button>
+        <button class="btn btn-submit" id="submitBtn" onclick="submitForm()" disabled>提交</button>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" class="file-input" id="fileInput" accept="image/*" capture="environment" multiple>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        // 待协助申请线索数据（与评估线索查询页面相同）
+        const originalClues = [
+            { id: 1, date: '2025-06-15', name: '张三', familyName: '张小明', community: '幸福社区', address: '1栋2单元301室', 
+              phone: '138XXXX1234', idCard: '34012319900101XXXX', source: '社区', remark: '', level: '重度失能（三级）' },
+            { id: 2, date: '2025-06-14', name: '李四', familyName: '李五', community: '西湖区XX社区', address: '西湖区XX街道XX小区3栋502室', 
+              phone: '13812345678', idCard: '330101********1234', source: '社区', remark: '如:需周末上门协助申请', level: '中度失能（二级）' },
+            { id: 3, date: '2025-06-14', name: '王五', familyName: '王强', community: '和谐小区', address: '3栋5单元102室', 
+              phone: '135XXXX6789', idCard: '34012319780923XXXX', source: '医院', remark: '', level: '轻度失能（一级）' },
+            { id: 4, date: '2025-06-13', name: '赵六', familyName: '赵敏', community: '阳光村', address: '村委会旁', 
+              phone: '133XXXX2345', idCard: '34012319820315XXXX', source: '社区', remark: '', level: '重度失能（三级）' },
+            { id: 5, date: '2025-06-12', name: '孙七', familyName: '孙伟', community: '幸福社区', address: '2栋1单元501室', 
+              phone: '131XXXX5678', idCard: '34012319950708XXXX', source: '街道', remark: '', level: '中度失能（二级）' }
+        ];
+        
+        let currentClues = [...originalClues];
+        let selectedClue = null; // 当前选中的服务对象
+
+        // 三级地址级联数据（街道/乡镇 -> 社区/村屯 -> 小区/自然村）
+        const regionData = {
+            'XX街道': {
+                '幸福社区': ['XX小区', 'YY小区'],
+                'XX社区': ['XX小区', 'YY小区']
+            },
+            'YY街道': {
+                '平安村镇': ['AA村', 'BB村'],
+                '和谐小区': ['和谐小区']
+            },
+            'XX镇': {
+                '阳光村': ['东村', '西村']
+            }
+        };
+
+        // 初始化地址级联选择
+        function initRegionCascade() {
+            const streetSelect = document.getElementById('filterStreet');
+            const communitySelect = document.getElementById('filterCommunity');
+            const cellSelect = document.getElementById('filterCell');
+            
+            if (!streetSelect) return; // 如果元素不存在，直接返回
+            
+            // 初始化街道/乡镇选项
+            Object.keys(regionData).forEach(street => {
+                const option = document.createElement('option');
+                option.value = street;
+                option.textContent = street;
+                streetSelect.appendChild(option);
+            });
+        }
+
+        // 街道/乡镇变化时更新社区/村屯选项
+        function onStreetChange() {
+            const street = document.getElementById('filterStreet').value;
+            const communitySelect = document.getElementById('filterCommunity');
+            const cellSelect = document.getElementById('filterCell');
+            
+            // 清空并重置社区/村屯和小区/自然村
+            communitySelect.innerHTML = '<option value="">全部</option>';
+            cellSelect.innerHTML = '<option value="">全部</option>';
+            
+            if (street && regionData[street]) {
+                Object.keys(regionData[street]).forEach(community => {
+                    const option = document.createElement('option');
+                    option.value = community;
+                    option.textContent = community;
+                    communitySelect.appendChild(option);
+                });
+            }
+            
+            filterClues();
+        }
+
+        // 社区/村屯变化时更新小区/自然村选项
+        function onCommunityChange() {
+            const street = document.getElementById('filterStreet').value;
+            const community = document.getElementById('filterCommunity').value;
+            const cellSelect = document.getElementById('filterCell');
+            
+            // 清空并重置小区/自然村
+            cellSelect.innerHTML = '<option value="">全部</option>';
+            
+            if (street && community && regionData[street] && regionData[street][community]) {
+                regionData[street][community].forEach(cell => {
+                    const option = document.createElement('option');
+                    option.value = cell;
+                    option.textContent = cell;
+                    cellSelect.appendChild(option);
+                });
+            }
+            
+            filterClues();
+        }
+        
+        // 档案材料结构（根据数据库）
+        const archiveStructure = {
+            1: [ // 初评材料
+                { id: 1, name: '本人身份证', pageNum: 2, optional: false, yangNeed: false },
+                { id: 2, name: '代理人身份证', pageNum: 2, optional: true, yangNeed: false },
+                { id: 4, name: '失能等级自评表', pageNum: 1, optional: false, yangNeed: false },
+                { id: 5, name: '评估申请表', pageNum: 2, optional: false, yangNeed: false },
+                { id: 6, name: '病情承诺书', pageNum: 1, optional: false, yangNeed: false },
+                { id: 7, name: '病例或证明', pageNum: 0, optional: false, yangNeed: true }
+            ],
+        };
+        
+        // 上传的文件数据
+        let uploadedFiles = {
+            1: {}, // position=1的文件
+        };
+        
+        let totalFileCount = 0;
+        let locationConfirmed = false;
+        let currentUploadCategory = null;
+        let currentUploadFileId = null;
+        
+        // 地理位置数据
+        let locationData = {
+            longitude: null,
+            latitude: null,
+            name: '',
+            landmark: ''
+        };
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            // 初始化地址级联选择
+            initRegionCascade();
+            
+            // 检查URL参数，如果有clueId则直接进入表单页面
+            const urlParams = new URLSearchParams(window.location.search);
+            const clueId = urlParams.get('clueId');
+            
+            if (clueId) {
+                const clue = originalClues.find(c => c.id == clueId);
+                if (clue) {
+                    selectClue(clue);
+                } else {
+                    showListPage();
+                }
+            } else {
+                showListPage();
+            }
+        };
+        
+        // 显示列表页面
+        function showListPage() {
+            document.getElementById('listPage').classList.remove('hidden');
+            document.getElementById('formPage').classList.remove('show');
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('formBtnBar').style.display = 'none';
+            document.getElementById('pageTitle').textContent = '选择服务对象';
+            renderClueList();
+        }
+        
+        // 显示表单页面
+        function showFormPage() {
+            document.getElementById('listPage').classList.add('hidden');
+            document.getElementById('formPage').classList.add('show');
+            document.getElementById('listBtnBar').style.display = 'none';
+            document.getElementById('formBtnBar').style.display = 'flex';
+            document.getElementById('pageTitle').textContent = '现场协助申请登记';
+            initArchiveUpload();
+            getLocation();
+        }
+        
+        // 渲染线索列表
+        function renderClueList() {
+            const container = document.getElementById('clueListContainer');
+            container.innerHTML = '';
+            
+            if (currentClues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-data">
+                        <div class="empty-icon">📄</div>
+                        <div>暂无符合条件的线索</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentClues.forEach(clue => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="col-date">${clue.date}</div>
+                    <div class="col-name">${clue.name}</div>
+                    <div class="col-family">${clue.level || '-'}</div>
+                    <div class="col-community">${clue.community}</div>
+                    <div class="col-address">${clue.address}</div>
+                    <div class="col-phone" style="display: flex; align-items: center; gap: 4px;">
+                        <span>${clue.phone || '-'}</span>
+                        ${clue.phone ? `<a href="tel:${clue.phone.replace(/\s/g, '').replace(/X/g, '0')}" style="color: var(--primary-color); text-decoration: none; font-size: 12px;">📞</a>` : ''}
+                    </div>
+                    <div class="col-source">${clue.source || '-'}</div>
+                    <div class="col-action">
+                        <button class="select-btn" onclick="selectClueById(${clue.id})">选择</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 筛选线索
+        function filterClues() {
+            const date = document.getElementById('filterDate').value;
+            const name = document.getElementById('filterName').value.toLowerCase();
+            const street = document.getElementById('filterStreet').value;
+            const community = document.getElementById('filterCommunity').value;
+            const cell = document.getElementById('filterCell').value;
+            
+            currentClues = originalClues.filter(clue => {
+                let match = true;
+                
+                if (date && clue.date !== date) match = false;
+                if (name && !clue.name.toLowerCase().includes(name)) match = false;
+                
+                // 三级地址筛选：如果选择了街道，则必须匹配街道；如果选择了社区，则必须匹配社区；如果选择了小区，则必须匹配小区
+                // 支持只选择前一级或前二级
+                if (street) {
+                    // 检查线索的地址是否包含该街道
+                    const addressMatch = clue.address.includes(street) || clue.community.includes(street);
+                    if (!addressMatch) {
+                        // 如果还选择了社区，需要更精确匹配
+                        if (community) {
+                            if (!clue.community.includes(community)) match = false;
+                        } else {
+                            match = false;
+                        }
+                    } else if (community) {
+                        if (!clue.community.includes(community)) match = false;
+                        if (cell && !clue.address.includes(cell)) match = false;
+                    } else if (cell) {
+                        if (!clue.address.includes(cell)) match = false;
+                    }
+                } else if (community) {
+                    if (!clue.community.includes(community)) match = false;
+                    if (cell && !clue.address.includes(cell)) match = false;
+                } else if (cell) {
+                    if (!clue.address.includes(cell)) match = false;
+                }
+                
+                return match;
+            });
+            
+            renderClueList();
+        }
+        
+        // 重置筛选条件
+        function resetFilter() {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterStreet').value = '';
+            document.getElementById('filterCommunity').value = '';
+            document.getElementById('filterCell').value = '';
+            
+            // 重置级联选择
+            document.getElementById('filterCommunity').innerHTML = '<option value="">全部</option>';
+            document.getElementById('filterCell').innerHTML = '<option value="">全部</option>';
+            
+            currentClues = [...originalClues];
+            renderClueList();
+        }
+        
+        // 根据ID选择线索
+        function selectClueById(clueId) {
+            const clue = originalClues.find(c => c.id === clueId);
+            if (clue) {
+                selectClue(clue);
+            }
+        }
+        
+        // 选择服务对象并跳转到表单页面
+        function selectClue(clue) {
+            selectedClue = clue;
+            
+            // 预填充表单数据
+            document.getElementById('clientName').value = clue.name || '';
+            document.getElementById('clientIdCard').value = clue.idCard || '';
+            document.getElementById('clientPhone').value = clue.phone || '';
+            document.getElementById('clientHukouAddress').value = clue.community + clue.address || '';
+            
+            // 填充家属信息
+            document.getElementById('familyName').value = clue.familyName || '';
+            document.getElementById('familyPhone').value = clue.phone || ''; // 如果有家属电话字段
+            
+            // 显示表单页面
+            showFormPage();
+            
+            // 更新服务对象信息显示区域
+            updateServiceObjectInfo(clue);
+            
+            // 显示已选服务对象信息区域
+            document.getElementById('selectedClueInfoSection').style.display = 'block';
+            
+            // 更新提交按钮状态
+            updateSubmitButton();
+        }
+        
+        // 更新服务对象信息显示
+        function updateServiceObjectInfo(clue) {
+            // 如果页面上有显示服务对象信息的区域，更新它
+            const infoSection = document.getElementById('selectedClueInfo');
+            if (infoSection) {
+                const fullAddress = `${clue.community}${clue.address}`;
+                infoSection.innerHTML = `
+                    <div class="form-item">
+                        <div class="form-label">失能等级</div>
+                        <div class="form-content">${clue.level || '未评估'}</div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">联系电话</div>
+                        <div class="form-content" style="display: flex; align-items: center; gap: 8px;">
+                            <span>${clue.phone || '未填写'}</span>
+                            ${clue.phone ? `<a href="tel:${clue.phone.replace(/\s/g, '').replace(/X/g, '0')}" style="color: var(--primary-color); text-decoration: none; font-size: 16px;">📞</a>` : ''}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">服务地址</div>
+                        <div class="form-content" style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>${fullAddress || '未填写'}</span>
+                            ${fullAddress ? `<button onclick="openRegistrationNavigation('${fullAddress}')" style="padding: 4px 12px; background: var(--primary-color); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 打开登记功能导航
+        function openRegistrationNavigation(address) {
+            if (!address) {
+                showToast('地址信息不完整');
+                return;
+            }
+            
+            const amapUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(address)}&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1`;
+            const amapLink = document.createElement('a');
+            amapLink.href = amapUrl;
+            amapLink.target = '_blank';
+            amapLink.click();
+            
+            setTimeout(() => {
+                const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(address)}&mode=driving&region=全国&output=html&src=webapp`;
+                window.open(baiduUrl, '_blank');
+            }, 500);
+            
+            showToast(`正在打开地图导航...`);
+        }
+        
+        // 初始化档案上传区域
+        function initArchiveUpload() {
+            // 只初始化初评材料（position=1）
+            const container = document.getElementById('archiveCategory1');
+            if (container) {
+                container.innerHTML = ''; // 清空之前的内容
+                const files = archiveStructure[1];
+                
+                files.forEach(file => {
+                    const uploadItem = createUploadItem(file, 1);
+                    container.appendChild(uploadItem);
+                });
+            }
+        }
+        
+        // 创建上传项
+        function createUploadItem(file, position) {
+            const item = document.createElement('div');
+            item.className = 'upload-item';
+            item.dataset.fileId = file.id;
+            item.dataset.position = position;
+            
+            // 检查是否已有上传的文件
+            const uploadedFile = uploadedFiles[position][file.id];
+            
+            // 创建标题
+            const header = document.createElement('div');
+            header.className = 'upload-item-header';
+            let headerText = file.name;
+            if (file.pageNum > 0) {
+                headerText += ` (${file.pageNum}页)`;
+            }
+            header.textContent = headerText;
+            
+            // 创建内容区域
+            const body = document.createElement('div');
+            body.className = 'upload-item-body';
+            
+            if (uploadedFile) {
+                // 显示已上传的图片
+                item.classList.add('uploaded');
+                const img = document.createElement('img');
+                img.src = uploadedFile.url;
+                img.alt = file.name;
+                body.appendChild(img);
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '×';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteFile(position, file.id);
+                };
+                body.appendChild(deleteBtn);
+                
+                const status = document.createElement('div');
+                status.className = 'file-status';
+                status.textContent = '已上传';
+                body.appendChild(status);
+                
+                item.onclick = () => previewFile(uploadedFile.url, file.name);
+            } else {
+                // 显示添加按钮
+                item.classList.add('add-btn');
+                item.onclick = () => openFilePicker(position, file.id, file.name);
+            }
+            
+            // 添加标签
+            if (file.optional) {
+                const optionalTag = document.createElement('div');
+                optionalTag.className = 'optional-tag';
+                optionalTag.textContent = '可选';
+                body.appendChild(optionalTag);
+            }
+            
+            if (file.yangNeed) {
+                const yangTag = document.createElement('div');
+                yangTag.className = 'yang-need-tag';
+                yangTag.textContent = '60岁以下';
+                body.appendChild(yangTag);
+            }
+            
+            item.appendChild(header);
+            item.appendChild(body);
+            
+            return item;
+        }
+        
+        // 打开文件选择器
+        function openFilePicker(position, fileId, fileName) {
+            if (totalFileCount >= 10) {
+                showToast('最多只能上传10张图片');
+                return;
+            }
+            
+            currentUploadCategory = position;
+            currentUploadFileId = fileId;
+            
+            const fileInput = document.getElementById('fileInput');
+            fileInput.onchange = function(e) {
+                handleFileSelect(e, position, fileId, fileName);
+            };
+            fileInput.click();
+        }
+        
+        // 处理文件选择
+        function handleFileSelect(event, position, fileId, fileName) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件');
+                return;
+            }
+            
+            // 生成文件名：日期+服务对象姓名+材料类型
+            const clientName = document.getElementById('clientName').value || '服务对象';
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const fileExtension = file.name.split('.').pop();
+            const generatedFileName = `${date}${clientName}${fileName}.${fileExtension}`;
+            
+            // 创建预览URL
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileData = {
+                    file: file,
+                    url: e.target.result,
+                    fileName: generatedFileName,
+                    fileId: fileId,
+                    position: position
+                };
+                
+                // 保存文件数据
+                uploadedFiles[position][fileId] = fileData;
+                totalFileCount++;
+                
+                // 更新上传项显示
+                updateUploadItem(position, fileId, fileData);
+                
+                // 更新提交按钮状态
+                updateSubmitButton();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 更新上传项
+        function updateUploadItem(position, fileId, fileData) {
+            const container = document.getElementById(`archiveCategory${position}`);
+            const item = container.querySelector(`[data-file-id="${fileId}"]`);
+            
+            if (item) {
+                const file = archiveStructure[position].find(f => f.id === fileId);
+                item.className = 'upload-item uploaded';
+                
+                // 保留标题
+                const header = item.querySelector('.upload-item-header');
+                
+                // 更新内容区域
+                const body = item.querySelector('.upload-item-body');
+                body.innerHTML = '';
+                
+                const img = document.createElement('img');
+                img.src = fileData.url;
+                img.alt = file.name;
+                body.appendChild(img);
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '×';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteFile(position, fileId);
+                };
+                body.appendChild(deleteBtn);
+                
+                const status = document.createElement('div');
+                status.className = 'file-status';
+                status.textContent = '已上传';
+                body.appendChild(status);
+                
+                // 重新添加标签
+                if (file.optional) {
+                    const optionalTag = document.createElement('div');
+                    optionalTag.className = 'optional-tag';
+                    optionalTag.textContent = '可选';
+                    body.appendChild(optionalTag);
+                }
+                
+                if (file.yangNeed) {
+                    const yangTag = document.createElement('div');
+                    yangTag.className = 'yang-need-tag';
+                    yangTag.textContent = '60岁以下';
+                    body.appendChild(yangTag);
+                }
+                
+                item.onclick = () => previewFile(fileData.url, file.name);
+            }
+        }
+        
+        // 删除文件
+        function deleteFile(position, fileId) {
+            if (confirm('确定要删除这张图片吗？')) {
+                delete uploadedFiles[position][fileId];
+                totalFileCount--;
+                
+                // 重新创建上传项
+                const container = document.getElementById(`archiveCategory${position}`);
+                const item = container.querySelector(`[data-file-id="${fileId}"]`);
+                const file = archiveStructure[position].find(f => f.id === fileId);
+                
+                item.className = 'upload-item add-btn';
+                
+                // 保留标题
+                const header = item.querySelector('.upload-item-header');
+                
+                // 重置内容区域
+                const body = item.querySelector('.upload-item-body');
+                body.innerHTML = '';
+                
+                item.onclick = () => openFilePicker(position, fileId, file.name);
+                
+                updateSubmitButton();
+            }
+        }
+        
+        // 预览文件
+        function previewFile(url, fileName) {
+            // 实际项目中可以打开全屏预览
+            showToast(`预览：${fileName}`);
+        }
+        
+        // 获取地理位置
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationData.latitude = position.coords.latitude;
+                        locationData.longitude = position.coords.longitude;
+                        
+                        document.getElementById('locationCoordinates').textContent = 
+                            `${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`;
+                        
+                        // 反向地理编码获取地点名称（实际项目中调用地图API）
+                        reverseGeocode(locationData.latitude, locationData.longitude);
+                    },
+                    function(error) {
+                        document.getElementById('locationCoordinates').textContent = '获取失败';
+                        document.getElementById('locationName').textContent = '请手动输入';
+                        showToast('无法获取GPS位置，请检查定位权限');
+                    }
+                );
+            } else {
+                document.getElementById('locationCoordinates').textContent = '不支持定位';
+                document.getElementById('locationName').textContent = '请手动输入';
+            }
+        }
+        
+        // 反向地理编码（模拟）
+        function reverseGeocode(lat, lng) {
+            // 实际项目中调用地图API获取地点名称
+            // 这里模拟返回
+            setTimeout(() => {
+                locationData.name = 'XX村村委会旁';
+                document.getElementById('locationName').textContent = locationData.name;
+            }, 500);
+        }
+        
+        // 确认定位信息
+        function confirmLocation() {
+            if (!locationData.latitude || !locationData.longitude) {
+                showToast('请先获取GPS位置');
+                return;
+            }
+            
+            locationData.landmark = document.getElementById('landmarkPosition').value;
+            locationConfirmed = true;
+            
+            // 禁用定位相关输入
+            document.getElementById('landmarkPosition').readOnly = true;
+            document.getElementById('confirmLocationBtn').disabled = true;
+            document.getElementById('locationConfirmed').style.display = 'block';
+            
+            updateSubmitButton();
+            showToast('定位信息已确认');
+        }
+        
+        // 身份证识别（模拟）
+        function scanIdCard(type) {
+            showToast('正在打开相机识别身份证...');
+            
+            // 实际项目中调用相机API识别身份证
+            setTimeout(() => {
+                if (type === 'client') {
+                    // 模拟识别结果
+                    document.getElementById('clientIdCard').value = '330101199001011234';
+                    document.getElementById('clientHukouAddress').value = '浙江省杭州市西湖区XX街道XX社区';
+                    showToast('身份证识别成功');
+                } else {
+                    document.getElementById('familyIdCard').value = '330101198001011234';
+                    showToast('身份证识别成功');
+                }
+            }, 1500);
+        }
+        
+        // 更新提交按钮状态
+        function updateSubmitButton() {
+            const clientName = document.getElementById('clientName').value;
+            const clientGender = document.querySelector('input[name="clientGender"]:checked');
+            const clientIdCard = document.getElementById('clientIdCard').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const medicalInsurance = document.getElementById('medicalInsuranceType').value;
+            const disabilityReason = document.querySelector('input[name="disabilityReason"]:checked');
+            
+            const canSubmit = clientName && 
+                             clientGender && 
+                             clientIdCard && 
+                             clientPhone && 
+                             medicalInsurance && 
+                             disabilityReason && 
+                             locationConfirmed;
+            
+            document.getElementById('submitBtn').disabled = !canSubmit;
+        }
+        
+        // 监听表单变化
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('.form-input, .form-select, .form-textarea')) {
+                updateSubmitButton();
+            }
+        });
+        
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input[type="radio"]')) {
+                updateSubmitButton();
+            }
+        });
+        
+        // 提交表单
+        function submitForm() {
+            // 收集表单数据
+            const formData = {
+                // 服务对象信息
+                client: {
+                    name: document.getElementById('clientName').value,
+                    gender: document.querySelector('input[name="clientGender"]:checked')?.value,
+                    idCard: document.getElementById('clientIdCard').value,
+                    hukouAddress: document.getElementById('clientHukouAddress').value,
+                    residenceAddress: document.getElementById('clientResidenceAddress').value,
+                    phone: document.getElementById('clientPhone').value,
+                    medicalInsuranceType: document.getElementById('medicalInsuranceType').value,
+                    disabilityLevel: document.getElementById('disabilityLevel').value,
+                    isLowIncome: document.querySelector('input[name="isLowIncome"]:checked')?.value,
+                    disabilityReason: document.querySelector('input[name="disabilityReason"]:checked')?.value,
+                    description: document.getElementById('clientDescription').value
+                },
+                // 家属信息
+                family: {
+                    name: document.getElementById('familyName').value,
+                    idCard: document.getElementById('familyIdCard').value,
+                    phone: document.getElementById('familyPhone').value,
+                    relation: document.getElementById('familyRelation').value
+                },
+                // 地理位置
+                location: locationData,
+                // 上传的文件
+                files: uploadedFiles
+            };
+            
+            // 验证必填项
+            if (!formData.client.name) {
+                showToast('请填写服务对象姓名');
+                return;
+            }
+            if (!formData.client.gender) {
+                showToast('请选择服务对象性别');
+                return;
+            }
+            if (!formData.client.idCard) {
+                showToast('请填写服务对象身份证号');
+                return;
+            }
+            if (!formData.client.phone) {
+                showToast('请填写服务对象联系电话');
+                return;
+            }
+            if (!formData.client.medicalInsuranceType) {
+                showToast('请选择医保类型');
+                return;
+            }
+            if (!formData.client.disabilityReason) {
+                showToast('请选择失能原因');
+                return;
+            }
+            if (!locationConfirmed) {
+                showToast('请确认定位信息');
+                return;
+            }
+            
+            // 实际项目中这里提交到服务器
+            console.log('提交表单数据:', formData);
+            showToast('提交成功，数据已同步至平台');
+            
+            // 延迟返回列表页面
+            setTimeout(() => {
+                showListPage();
+                resetForm();
+            }, 1500);
+        }
+        
+        // 返回上一页
+        function goBack() {
+            // 如果在表单页面，返回列表页面
+            if (document.getElementById('formPage').classList.contains('show')) {
+                if (confirm('确定要返回吗？未保存的数据将丢失。')) {
+                    showListPage();
+                    // 重置表单
+                    resetForm();
+                }
+            } else {
+                // 如果在列表页面，返回首页
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // 重置表单
+        function resetForm() {
+            selectedClue = null;
+            locationConfirmed = false;
+            uploadedFiles = { 1: {} };
+            totalFileCount = 0;
+            locationData = {
+                longitude: null,
+                latitude: null,
+                name: '',
+                landmark: ''
+            };
+            
+            // 清空所有表单字段
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientIdCard').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('clientHukouAddress').value = '';
+            document.querySelector('input[name="clientGender"]:checked')?.removeAttribute('checked');
+            document.getElementById('medicalInsuranceType').value = '';
+            document.getElementById('disabilityLevel').value = '';
+            document.querySelector('input[name="isLowIncome"]:checked')?.removeAttribute('checked');
+            document.querySelector('input[name="disabilityReason"]:checked')?.removeAttribute('checked');
+            document.getElementById('clientDescription').value = '';
+            document.getElementById('familyName').value = '';
+            document.getElementById('familyIdCard').value = '';
+            document.getElementById('familyPhone').value = '';
+            document.getElementById('familyRelation').value = '';
+            document.getElementById('landmarkPosition').value = '';
+            document.getElementById('landmarkPosition').readOnly = false;
+            document.getElementById('confirmLocationBtn').disabled = false;
+            document.getElementById('locationConfirmed').style.display = 'none';
+            
+            // 重新获取定位
+            getLocation();
+        }
+        
+        // 显示提示框
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

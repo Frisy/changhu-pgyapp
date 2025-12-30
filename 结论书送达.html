@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>居家长护协助申请系统 - 结论书送达</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            font-size: 14px;
+            color: #333;
+        }
+        /* 顶部导航栏 */
+        .nav-bar {
+            height: 44px;
+            line-height: 44px;
+            background-color: #2f80ed;
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+        .nav-back {
+            font-size: 18px;
+            cursor: pointer;
+        }
+        /* 筛选栏 */
+        .filter-bar {
+            position: fixed;
+            top: 44px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            z-index: 998;
+        }
+        .filter-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .filter-option {
+            padding: 6px 12px;
+            background-color: #f5f5f5;
+            border-radius: 16px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .filter-option.active {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 内容容器 */
+        .content {
+            padding: 130px 15px 70px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        /* 列表样式 */
+        .list-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .list-empty {
+            text-align: center;
+            padding: 50px 0;
+            color: #999;
+        }
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        /* 列表项 */
+        .list-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .item-level {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        .item-date {
+            font-size: 12px;
+            color: #999;
+        }
+        .item-id {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .level-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #fff;
+            margin-right: 5px;
+        }
+        .level-heavy {
+            background-color: #ff4d4f;
+        }
+        .level-medium {
+            background-color: #faad14;
+        }
+        .level-light {
+            background-color: #52c41a;
+        }
+        .item-btn {
+            padding: 6px 12px;
+            background-color: #2f80ed;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        /* 上传页面样式 */
+        .upload-page {
+            display: none;
+        }
+        .upload-page.active {
+            display: block;
+        }
+        .page-header {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        /* 材料上传区域 */
+        .upload-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .required-mark {
+            color: #ff4d4f;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .upload-area:hover {
+            border-color: #2f80ed;
+        }
+        .upload-icon {
+            font-size: 30px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            font-size: 14px;
+            color: #999;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .preview-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff4d4f;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        /* 送达信息 */
+        .delivery-info {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .info-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            width: 80px;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        /* 底部按钮栏 */
+        .btn-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            z-index: 998;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-cancel {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        .btn-submit {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-confirm {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-bar">
+        <div class="nav-back" onclick="goBack()">←</div>
+        <div>结论书送达</div>
+        <div></div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+        <div class="filter-title">筛选条件</div>
+        <div class="filter-options">
+            <div class="filter-option active" onclick="filterList('all')">全部</div>
+            <div class="filter-option" onclick="filterList('heavy')">重度需签协议</div>
+            <div class="filter-option" onclick="filterList('medium')">中度失能</div>
+            <div class="filter-option" onclick="filterList('light')">轻度失能</div>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 列表页面 -->
+        <div id="listPage">
+            <div class="list-title">待送达结论书</div>
+            
+            <!-- 列表项 - 重度 -->
+            <div class="list-item" data-type="heavy">
+                <div class="item-info">
+                    <div class="item-name">张三</div>
+                    <div class="item-level">
+                        <span class="level-tag level-heavy">重度-一级</span>
+                        失能等级
+                    </div>
+                    <div class="item-date" style="margin-top: 5px;">
+                        <div style="margin-bottom: 3px;">📍 安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>📞 13800131234</span>
+                            <a href="tel:13800131234" style="color: #2f80ed; text-decoration: none; font-size: 14px;">拨打</a>
+                            <button onclick="openConclusionNavigation('安徽省合肥市庐阳区XX街道XX社区1栋2单元301室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                        </div>
+                    </div>
+                    <div class="item-date">公示日期：2025-10-25</div>
+                </div>
+                <div class="item-btn" onclick="openUpload('张三', '340123199001011234', '重度-一级', '2025-10-25', '安徽省合肥市庐阳区XX街道XX社区1栋2单元301室', '13800131234')">送达上传</div>
+            </div>
+            
+            <!-- 列表项 - 中度 -->
+            <div class="list-item" data-type="medium">
+                <div class="item-info">
+                    <div class="item-name">李四</div>
+                    <div class="item-level">
+                        <span class="level-tag level-medium">中度失能</span>
+                        失能等级
+                    </div>
+                    <div class="item-date" style="margin-top: 5px;">
+                        <div style="margin-bottom: 3px;">📍 安徽省合肥市包河区XX街道XX社区2栋1单元502室</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>📞 13900139000</span>
+                            <a href="tel:13900139000" style="color: #2f80ed; text-decoration: none; font-size: 14px;">拨打</a>
+                            <button onclick="openConclusionNavigation('安徽省合肥市包河区XX街道XX社区2栋1单元502室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                        </div>
+                    </div>
+                    <div class="item-date">公示日期：2025-10-23</div>
+                </div>
+                <div class="item-btn" onclick="openUpload('李四', '340123198505056789', '中度失能', '2025-10-23', '安徽省合肥市包河区XX街道XX社区2栋1单元502室', '13900139000')">送达上传</div>
+            </div>
+            
+            <!-- 列表项 - 轻度 -->
+            <div class="list-item" data-type="light">
+                <div class="item-info">
+                    <div class="item-name">王五</div>
+                    <div class="item-level">
+                        <span class="level-tag level-light">轻度失能</span>
+                        失能等级
+                    </div>
+                    <div class="item-date" style="margin-top: 5px;">
+                        <div style="margin-bottom: 3px;">📍 安徽省合肥市蜀山区XX街道XX社区3栋5单元102室</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>📞 13700137000</span>
+                            <a href="tel:13700137000" style="color: #2f80ed; text-decoration: none; font-size: 14px;">拨打</a>
+                            <button onclick="openConclusionNavigation('安徽省合肥市蜀山区XX街道XX社区3栋5单元102室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                        </div>
+                    </div>
+                    <div class="item-date">公示日期：2025-10-20</div>
+                </div>
+                <div class="item-btn" onclick="openUpload('王五', '340123197010101234', '轻度失能', '2025-10-20', '安徽省合肥市蜀山区XX街道XX社区3栋5单元102室', '13700137000')">送达上传</div>
+            </div>
+            
+            <!-- 列表项 - 重度 -->
+            <div class="list-item" data-type="heavy">
+                <div class="item-info">
+                    <div class="item-name">赵六</div>
+                    <div class="item-level">
+                        <span class="level-tag level-heavy">重度-二级</span>
+                        失能等级
+                    </div>
+                    <div class="item-date" style="margin-top: 5px;">
+                        <div style="margin-bottom: 3px;">📍 安徽省合肥市瑶海区XX街道XX社区4栋3单元201室</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>📞 13600136000</span>
+                            <a href="tel:13600136000" style="color: #2f80ed; text-decoration: none; font-size: 14px;">拨打</a>
+                            <button onclick="openConclusionNavigation('安徽省合肥市瑶海区XX街道XX社区4栋3单元201室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                        </div>
+                    </div>
+                    <div class="item-date">公示日期：2025-10-18</div>
+                </div>
+                <div class="item-btn" onclick="openUpload('赵六', '340123196503036789', '重度-二级', '2025-10-18', '安徽省合肥市瑶海区XX街道XX社区4栋3单元201室', '13600136000')">送达上传</div>
+            </div>
+        </div>
+
+        <!-- 上传页面 -->
+        <div id="uploadPage" class="upload-page">
+            <div class="page-header">结论书送达 - <span id="uploadUserName">张三</span></div>
+            
+            <!-- 协助申请结论书上传 -->
+            <div class="upload-section">
+                <div class="section-title">协助申请结论书 <span class="required-mark">*</span></div>
+                <div class="upload-area" onclick="selectImage('conclusion')">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击拍摄或选择图片</div>
+                </div>
+                <div class="preview-container" id="conclusionPreview"></div>
+            </div>
+            
+            <!-- 服务协议上传（重度显示） -->
+            <div class="upload-section" id="agreementSection" style="display: none;">
+                <div class="section-title">服务协议 <span class="required-mark">*</span></div>
+                <div class="upload-area" onclick="selectImage('agreement')">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击拍摄或选择图片</div>
+                </div>
+                <div class="preview-container" id="agreementPreview"></div>
+            </div>
+            
+            <!-- 首月服务计划上传（重度显示） -->
+            <div class="upload-section" id="planSection" style="display: none;">
+                <div class="section-title">首月服务计划 <span class="required-mark">*</span></div>
+                <div class="upload-area" onclick="selectImage('plan')">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击拍摄或选择图片</div>
+                </div>
+                <div class="preview-container" id="planPreview"></div>
+            </div>
+            
+            <!-- 送达信息 -->
+            <div class="delivery-info">
+                <div class="info-item">
+                    <div class="info-label">失能等级</div>
+                    <div class="info-value" id="uploadLevel">重度-一级</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">联系电话</div>
+                    <div class="info-value" id="uploadPhone" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13800131234</span>
+                        <a href="#" id="uploadPhoneLink" style="color: #2f80ed; text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">服务地址</div>
+                    <div class="info-value" id="uploadAddress" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</span>
+                        <button onclick="openConclusionNavigationFromUpload()" style="padding: 4px 12px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">公示日期</div>
+                    <div class="info-value" id="uploadPublicDate">2025-10-25</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">送达日期</div>
+                    <div class="info-value" id="deliveryDate">2025-10-28</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮栏 -->
+    <div class="btn-bar" id="listBtnBar">
+        <button class="nav-btn btn-cancel" onclick="goBack()">返回</button>
+    </div>
+    
+    <div class="btn-bar" id="uploadBtnBar" style="display: none;">
+        <button class="nav-btn btn-cancel" onclick="closeUpload()">取消</button>
+        <button class="nav-btn btn-submit" onclick="submitDelivery()">提交送达记录</button>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title">确认提交</div>
+            <div class="modal-body">
+                确认送达材料已签字清晰并提交记录？
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-cancel" onclick="hideConfirm()">取消</button>
+                <button class="modal-btn btn-confirm" onclick="confirmSubmit()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 成功弹窗 -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-title">操作成功</div>
+            <div class="modal-body">
+                送达记录已提交，电子档案生成成功
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-confirm" onclick="completeSubmit()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        let currentUser = {
+            name: '',
+            idCard: '',
+            level: '',
+            publicDate: '',
+            deliveryDate: '',
+            address: '',
+            phone: ''
+        };
+        
+        let uploadedFiles = {
+            conclusion: [],
+            agreement: [],
+            plan: []
+        };
+        
+        // 初始化日期
+        window.onload = function() {
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' + 
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(today.getDate()).padStart(2, '0');
+            document.getElementById('deliveryDate').textContent = dateStr;
+            currentUser.deliveryDate = dateStr;
+        };
+        
+        // 筛选列表
+        function filterList(type) {
+            // 更新筛选按钮状态
+            const options = document.querySelectorAll('.filter-option');
+            options.forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 筛选列表项
+            const items = document.querySelectorAll('.list-item');
+            items.forEach(item => {
+                if (type === 'all' || item.dataset.type === type) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // 打开导航
+        function openConclusionNavigation(address) {
+            if (!address) {
+                showToast('地址信息不完整');
+                return;
+            }
+            
+            const amapUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(address)}&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1`;
+            const amapLink = document.createElement('a');
+            amapLink.href = amapUrl;
+            amapLink.target = '_blank';
+            amapLink.click();
+            
+            setTimeout(() => {
+                const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(address)}&mode=driving&region=全国&output=html&src=webapp`;
+                window.open(baiduUrl, '_blank');
+            }, 500);
+            
+            showToast(`正在打开地图导航...`);
+        }
+        
+        // 打开上传页面
+        function openUpload(name, idCard, level, publicDate, address, phone) {
+            currentUser.name = name;
+            currentUser.idCard = idCard;
+            currentUser.level = level;
+            currentUser.publicDate = publicDate;
+            currentUser.address = address || '';
+            currentUser.phone = phone || '';
+            
+            // 重置上传文件
+            uploadedFiles = {
+                conclusion: [],
+                agreement: [],
+                plan: []
+            };
+            
+            // 更新页面信息
+            document.getElementById('uploadUserName').textContent = name;
+            document.getElementById('uploadLevel').textContent = level;
+            document.getElementById('uploadPublicDate').textContent = publicDate;
+            
+            // 更新电话和地址
+            const phoneElement = document.getElementById('uploadPhone');
+            const phoneLink = document.getElementById('uploadPhoneLink');
+            if (phone) {
+                phoneElement.querySelector('span').textContent = phone;
+                phoneLink.href = `tel:${phone}`;
+                phoneElement.style.display = 'flex';
+            } else {
+                phoneElement.style.display = 'none';
+            }
+            
+            const addressElement = document.getElementById('uploadAddress');
+            if (address) {
+                addressElement.querySelector('span').textContent = address;
+                addressElement.style.display = 'flex';
+            } else {
+                addressElement.style.display = 'none';
+            }
+            
+            // 清空预览
+            document.getElementById('conclusionPreview').innerHTML = '';
+            document.getElementById('agreementPreview').innerHTML = '';
+            document.getElementById('planPreview').innerHTML = '';
+            
+            // 显示重度相关上传区域
+            if (level.includes('重度')) {
+                document.getElementById('agreementSection').style.display = 'block';
+                document.getElementById('planSection').style.display = 'block';
+            } else {
+                document.getElementById('agreementSection').style.display = 'none';
+                document.getElementById('planSection').style.display = 'none';
+            }
+            
+            // 切换页面
+            document.getElementById('listPage').style.display = 'none';
+            document.getElementById('uploadPage').classList.add('active');
+            document.getElementById('listBtnBar').style.display = 'none';
+            document.getElementById('uploadBtnBar').style.display = 'flex';
+        }
+        
+        // 关闭上传页面
+        function closeUpload() {
+            document.getElementById('uploadPage').classList.remove('active');
+            document.getElementById('listPage').style.display = 'block';
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('uploadBtnBar').style.display = 'none';
+        }
+        
+        // 选择图片
+        function selectImage(type) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (files.length === 0) return;
+                
+                // 处理选中的图片
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const fileId = Date.now() + i;
+                        
+                        // 保存文件信息
+                        uploadedFiles[type].push({
+                            id: fileId,
+                            url: event.target.result,
+                            name: file.name
+                        });
+                        
+                        // 更新预览
+                        renderPreview(type);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        // 渲染预览
+        function renderPreview(type) {
+            const container = document.getElementById(type + 'Preview');
+            container.innerHTML = '';
+            
+            uploadedFiles[type].forEach(file => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${file.url}" class="preview-img">
+                    <div class="preview-delete" onclick="deleteImage('${type}', ${file.id})">×</div>
+                `;
+                container.appendChild(previewItem);
+            });
+        }
+        
+        // 删除图片
+        function deleteImage(type, id) {
+            uploadedFiles[type] = uploadedFiles[type].filter(file => file.id !== id);
+            renderPreview(type);
+        }
+        
+        // 提交送达记录
+        function submitDelivery() {
+            // 验证协助申请结论书是否上传
+            if (uploadedFiles.conclusion.length === 0) {
+                showToast('请上传协助申请结论书');
+                return;
+            }
+            
+            // 重度失能需上传服务协议和服务计划
+            if (currentUser.level.includes('重度')) {
+                if (uploadedFiles.agreement.length === 0) {
+                    showToast('请上传服务协议');
+                    return;
+                }
+                if (uploadedFiles.plan.length === 0) {
+                    showToast('请上传首月服务计划');
+                    return;
+                }
+            }
+            
+            // 显示确认弹窗
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        // 确认提交
+        function confirmSubmit() {
+            hideConfirm();
+            // 显示成功弹窗
+            document.getElementById('successModal').classList.add('show');
+        }
+        
+        // 完成提交
+        function completeSubmit() {
+            document.getElementById('successModal').classList.remove('show');
+            closeUpload();
+            showToast('送达记录提交成功');
+            
+            // 实际项目中这里会更新列表数据
+        }
+        
+        // 隐藏确认弹窗
+        function hideConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+        
+        // 返回上一页
+        function goBack() {
+            // 如果在上传页面，先返回列表页面
+            if (document.getElementById('uploadPage').classList.contains('active')) {
+                closeUpload();
+            } else {
+                // 如果在列表页面，返回主页
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // 从上传页面打开导航
+        function openConclusionNavigationFromUpload() {
+            if (currentUser.address) {
+                openConclusionNavigation(currentUser.address);
+            } else {
+                showToast('地址信息不完整');
+            }
+        }
+        
+        // 显示提示框
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

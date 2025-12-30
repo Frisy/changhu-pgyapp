@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>居家长护协助申请系统 - 服务变更管理</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            font-size: 14px;
+            color: #333;
+        }
+        /* 顶部导航栏 */
+        .nav-bar {
+            height: 44px;
+            line-height: 44px;
+            background-color: #2f80ed;
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+        .nav-back {
+            font-size: 18px;
+            cursor: pointer;
+        }
+        /* 类型切换栏 */
+        .type-tab {
+            position: fixed;
+            top: 44px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            display: flex;
+            border-bottom: 1px solid #eee;
+            z-index: 998;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-item.active {
+            border-bottom-color: #2f80ed;
+            color: #2f80ed;
+            font-weight: 500;
+        }
+        /* 搜索栏 */
+        .search-bar {
+            position: fixed;
+            top: 88px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            z-index: 997;
+        }
+        .search-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 18px;
+            font-size: 14px;
+            background-color: #f5f5f5;
+        }
+        /* 筛选栏 */
+        .filter-bar {
+            position: fixed;
+            top: 134px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 8px 15px;
+            border-bottom: 1px solid #eee;
+            z-index: 996;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+        .filter-item {
+            padding: 4px 12px;
+            background-color: #f5f5f5;
+            border-radius: 16px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .filter-item.active {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 内容容器 */
+        .content {
+            padding: 170px 15px 70px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        /* 列表样式 */
+        .list-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .list-empty {
+            text-align: center;
+            padding: 50px 0;
+            color: #999;
+        }
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        /* 列表项 */
+        .list-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .item-address {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+        .item-status {
+            font-size: 12px;
+            color: #999;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #fff;
+            margin-right: 5px;
+        }
+        .status-normal {
+            background-color: #52c41a;
+        }
+        .status-paused {
+            background-color: #faad14;
+        }
+        .item-level {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .item-btn {
+            padding: 6px 12px;
+            background-color: #2f80ed;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        /* 表单页面样式 */
+        .form-page {
+            display: none;
+        }
+        .form-page.active {
+            display: block;
+        }
+        .form-header {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        /* 表单区域 */
+        .form-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .required-mark {
+            color: #ff4d4f;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        .form-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        .form-label {
+            width: 90px;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #666;
+            padding-top: 8px;
+        }
+        .form-content {
+            flex: 1;
+        }
+        .form-input {
+            width: 100%;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-select {
+            width: 100%;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff;
+        }
+        .form-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: none;
+        }
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .upload-area:hover {
+            border-color: #2f80ed;
+        }
+        .upload-icon {
+            font-size: 30px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            font-size: 14px;
+            color: #999;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .preview-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff4d4f;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        /* 底部按钮栏 */
+        .btn-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            z-index: 998;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-cancel {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        .btn-submit {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-confirm {
+            background-color: #2f80ed;
+            color: #fff;
+        }
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-bar">
+        <div class="nav-back" onclick="goBack()">←</div>
+        <div>服务变更管理</div>
+        <div></div>
+    </div>
+
+    <!-- 类型切换 -->
+    <div class="type-tab">
+        <div class="tab-item active" id="pauseTab" onclick="switchType('pause')">暂停单签署</div>
+        <div class="tab-item" id="transferTab" onclick="switchType('transfer')">转出单签署</div>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索姓名或地址" oninput="searchUsers()">
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar" id="pauseFilter">
+        <div class="filter-item active" onclick="filterPauseList('all')">全部</div>
+        <div class="filter-item" onclick="filterPauseList('normal')">正常服务</div>
+    </div>
+    <div class="filter-bar" id="transferFilter" style="display: none;">
+        <div class="filter-item active" onclick="filterTransferList('all')">全部</div>
+        <div class="filter-item" onclick="filterTransferList('normal')">正常服务</div>
+        <div class="filter-item" onclick="filterTransferList('paused')">暂停服务</div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 暂停单列表页面 -->
+        <div id="pauseListPage">
+            <div class="list-title">暂停服务对象列表</div>
+            
+            <!-- 列表项 -->
+            <div class="list-item pause-item" data-type="normal" data-name="张三" data-address="庐阳区">
+                <div class="item-info">
+                    <div class="item-name">张三</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-normal">正常服务</span>
+                        <span style="margin-left: 5px;">失能等级：重度-一级</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市庐阳区XX街道XX社区1栋2单元301室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13800131234</span>
+                        <a href="tel:13800131234" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openPauseForm('张三', '340123199001011234', '重度-一级', '安徽省合肥市庐阳区XX街道XX社区1栋2单元301室', '13800131234')">选择</div>
+            </div>
+            
+            <div class="list-item pause-item" data-type="normal" data-name="李四" data-address="包河区">
+                <div class="item-info">
+                    <div class="item-name">李四</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-normal">正常服务</span>
+                        <span style="margin-left: 5px;">失能等级：中度失能</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市包河区XX街道XX社区2栋1单元502室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市包河区XX街道XX社区2栋1单元502室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13900139000</span>
+                        <a href="tel:13900139000" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openPauseForm('李四', '340123198505056789', '中度失能', '安徽省合肥市包河区XX街道XX社区2栋1单元502室', '13900139000')">选择</div>
+            </div>
+            
+            <div class="list-item pause-item" data-type="normal" data-name="王五" data-address="蜀山区">
+                <div class="item-info">
+                    <div class="item-name">王五</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-normal">正常服务</span>
+                        <span style="margin-left: 5px;">失能等级：轻度失能</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市蜀山区XX街道XX社区3栋5单元102室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市蜀山区XX街道XX社区3栋5单元102室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13700137000</span>
+                        <a href="tel:13700137000" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openPauseForm('王五', '340123197010101234', '轻度失能', '安徽省合肥市蜀山区XX街道XX社区3栋5单元102室', '13700137000')">选择</div>
+            </div>
+        </div>
+
+        <!-- 转出单列表页面 -->
+        <div id="transferListPage" style="display: none;">
+            <div class="list-title">转出服务对象列表</div>
+            
+            <!-- 列表项 -->
+            <div class="list-item transfer-item" data-type="normal" data-name="张三" data-address="庐阳区">
+                <div class="item-info">
+                    <div class="item-name">张三</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-normal">正常服务</span>
+                        <span style="margin-left: 5px;">失能等级：重度-一级</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市庐阳区XX街道XX社区1栋2单元301室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13800131234</span>
+                        <a href="tel:13800131234" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openTransferForm('张三', '340123199001011234', '重度-一级', '安徽省合肥市庐阳区XX街道XX社区1栋2单元301室', '13800131234')">选择</div>
+            </div>
+            
+            <div class="list-item transfer-item" data-type="paused" data-name="李四" data-address="包河区">
+                <div class="item-info">
+                    <div class="item-name">李四</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-paused">暂停服务</span>
+                        <span style="margin-left: 5px;">失能等级：中度失能</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市包河区XX街道XX社区2栋1单元502室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市包河区XX街道XX社区2栋1单元502室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13900139000</span>
+                        <a href="tel:13900139000" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openTransferForm('李四', '340123198505056789', '中度失能', '安徽省合肥市包河区XX街道XX社区2栋1单元502室', '13900139000')">选择</div>
+            </div>
+            
+            <div class="list-item transfer-item" data-type="normal" data-name="赵六" data-address="瑶海区">
+                <div class="item-info">
+                    <div class="item-name">赵六</div>
+                    <div class="item-status" style="margin-bottom: 5px;">
+                        <span class="status-tag status-normal">正常服务</span>
+                        <span style="margin-left: 5px;">失能等级：重度-二级</span>
+                    </div>
+                    <div class="item-address" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📍 安徽省合肥市瑶海区XX街道XX社区4栋3单元201室</span>
+                        <button onclick="openChangeNavigation('安徽省合肥市瑶海区XX街道XX社区4栋3单元201室')" style="padding: 2px 8px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px;">导航</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666;">
+                        <span>📞 13600136000</span>
+                        <a href="tel:13600136000" style="color: #2f80ed; text-decoration: none;">拨打</a>
+                    </div>
+                </div>
+                <div class="item-btn" onclick="openTransferForm('赵六', '340123196503036789', '重度-二级', '安徽省合肥市瑶海区XX街道XX社区4栋3单元201室', '13600136000')">选择</div>
+            </div>
+        </div>
+
+        <!-- 暂停单表单页面 -->
+        <div id="pauseFormPage" class="form-page">
+            <div class="form-header">暂停单签署 - <span id="pauseUserName">张三</span></div>
+            
+            <!-- 服务对象信息 -->
+            <div class="form-section">
+                <div class="section-title">服务对象信息</div>
+                <div class="form-item">
+                    <div class="form-label">失能等级</div>
+                    <div class="form-content" id="pauseLevel">重度-一级</div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">联系电话</div>
+                    <div class="form-content" id="pausePhone" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13800131234</span>
+                        <a href="#" id="pausePhoneLink" style="color: #2f80ed; text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">服务地址</div>
+                    <div class="form-content" id="pauseAddress" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</span>
+                        <button onclick="openChangeNavigationFromForm()" style="padding: 4px 12px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 暂停信息查看 -->
+            <div class="form-section">
+                <div class="section-title">暂停信息</div>
+                <div class="form-item">
+                    <div class="form-label">暂停开始日期</div>
+                    <div class="form-content" id="pauseStartDate">2024-01-15</div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">暂停类型</div>
+                    <div class="form-content" id="pauseType">暂时中止</div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">暂停原因</div>
+                    <div class="form-content" id="pauseReasonType">住院治疗</div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">原因说明</div>
+                    <div class="form-content" id="pauseReasonDesc">因心脏病住院治疗，暂时无法接受居家护理服务</div>
+                </div>
+            </div>
+            
+            <!-- 暂停单查看 -->
+            <div class="form-section">
+                <div class="section-title">暂停单</div>
+                <div class="preview-container" id="pauseOrderPreview">
+                    <!-- 示例暂停单图片，实际项目中从服务器获取 -->
+                    <div class="preview-item">
+                        <img src="https://via.placeholder.com/80x80?text=暂停单" class="preview-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 转出单表单页面 -->
+        <div id="transferFormPage" class="form-page">
+            <div class="form-header">转出单签署 - <span id="transferUserName">张三</span></div>
+            
+            <!-- 服务对象信息 -->
+            <div class="form-section">
+                <div class="section-title">服务对象信息</div>
+                <div class="form-item">
+                    <div class="form-label">失能等级</div>
+                    <div class="form-content" id="transferLevel">重度-一级</div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">联系电话</div>
+                    <div class="form-content" id="transferPhone" style="display: flex; align-items: center; gap: 8px;">
+                        <span>13800131234</span>
+                        <a href="#" id="transferPhoneLink" style="color: #2f80ed; text-decoration: none; font-size: 16px;">📞</a>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">当前服务地址</div>
+                    <div class="form-content" id="transferCurrentAddress" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>安徽省合肥市庐阳区XX街道XX社区1栋2单元301室</span>
+                        <button onclick="openChangeNavigationFromForm()" style="padding: 4px 12px; background: #2f80ed; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">导航</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 转出信息录入 -->
+            <div class="form-section">
+                <div class="section-title">转出信息 <span class="required-mark">*</span></div>
+                <div class="form-item">
+                    <div class="form-label">转出日期</div>
+                    <div class="form-content">
+                        <input type="date" class="form-input" id="transferDate" required>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">转出居住地址</div>
+                    <div class="form-content">
+                        <textarea class="form-textarea" id="transferAddress" placeholder="请填写详细的转出居住地址" required></textarea>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">联系人及电话</div>
+                    <div class="form-content">
+                        <input type="text" class="form-input" id="transferContact" placeholder="如：张三 13800138000" required>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">转出地机构名称</div>
+                    <div class="form-content">
+                        <input type="text" class="form-input" id="transferAgency" placeholder="请填写接收机构全称" required>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <div class="form-label">护理类型</div>
+                    <div class="form-content">
+                        <select class="form-select" id="careType" required>
+                            <option value="">请选择护理类型</option>
+                            <option value="居家护理">居家护理</option>
+                            <option value="机构护理">机构护理</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 转出单上传 -->
+            <div class="form-section">
+                <div class="section-title">转出单上传 <span class="required-mark">*</span></div>
+                <div class="upload-area" onclick="selectImage('transferOrder')">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击拍摄或选择转出单照片</div>
+                </div>
+                <div class="preview-container" id="transferOrderPreview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮栏 -->
+    <div class="btn-bar" id="listBtnBar">
+        <button class="nav-btn btn-cancel" onclick="goBack()">返回</button>
+    </div>
+    
+    <div class="btn-bar" id="pauseBtnBar" style="display: none;">
+        <button class="nav-btn btn-cancel" onclick="closePauseForm()">取消</button>
+        <button class="nav-btn btn-submit" onclick="submitPause()">提交</button>
+    </div>
+    
+    <div class="btn-bar" id="transferBtnBar" style="display: none;">
+        <button class="nav-btn btn-cancel" onclick="closeTransferForm()">取消</button>
+        <button class="nav-btn btn-submit" onclick="submitTransfer()">提交</button>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title" id="confirmTitle">确认提交</div>
+            <div class="modal-body" id="confirmMessage">
+                确认提交申请？提交后将进入审批流程。
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-cancel" onclick="hideConfirm()">取消</button>
+                <button class="modal-btn btn-confirm" onclick="confirmSubmit()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 成功弹窗 -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-title">操作成功</div>
+            <div class="modal-body" id="successMessage">
+                申请已提交，电子档案生成成功
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-confirm" onclick="completeSubmit()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        let currentType = 'pause'; // pause/transfer
+        let currentUser = {
+            name: '',
+            idCard: '',
+            level: '',
+            address: '',
+            phone: ''
+        };
+        
+        let uploadedFiles = {
+            pauseOrder: [],
+            transferOrder: []
+        };
+        
+        // 初始化日期
+        window.onload = function() {
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' + 
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(today.getDate()).padStart(2, '0');
+            document.getElementById('pauseStartDate').value = dateStr;
+            document.getElementById('transferDate').value = dateStr;
+        };
+        
+        // 切换业务类型
+        function switchType(type) {
+            currentType = type;
+            
+            // 更新标签状态
+            document.getElementById('pauseTab').classList.remove('active');
+            document.getElementById('transferTab').classList.remove('active');
+            document.getElementById(type + 'Tab').classList.add('active');
+            
+            // 切换筛选栏
+            document.getElementById('pauseFilter').style.display = type === 'pause' ? 'flex' : 'none';
+            document.getElementById('transferFilter').style.display = type === 'transfer' ? 'flex' : 'none';
+            
+            // 切换列表页面
+            document.getElementById('pauseListPage').style.display = type === 'pause' ? 'block' : 'none';
+            document.getElementById('transferListPage').style.display = type === 'transfer' ? 'block' : 'none';
+            
+            // 重置筛选
+            if (type === 'pause') {
+                filterPauseList('all');
+            } else {
+                filterTransferList('all');
+            }
+            
+            // 显示列表按钮栏
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('pauseBtnBar').style.display = 'none';
+            document.getElementById('transferBtnBar').style.display = 'none';
+            document.getElementById('pauseFormPage').classList.remove('active');
+            document.getElementById('transferFormPage').classList.remove('active');
+        }
+        
+        // 搜索服务对象
+        function searchUsers() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (currentType === 'pause') {
+                const items = document.querySelectorAll('.pause-item');
+                items.forEach(item => {
+                    const name = item.dataset.name.toLowerCase();
+                    const address = item.dataset.address.toLowerCase();
+                    item.style.display = (name.includes(searchText) || address.includes(searchText)) ? 'flex' : 'none';
+                });
+            } else {
+                const items = document.querySelectorAll('.transfer-item');
+                items.forEach(item => {
+                    const name = item.dataset.name.toLowerCase();
+                    const address = item.dataset.address.toLowerCase();
+                    item.style.display = (name.includes(searchText) || address.includes(searchText)) ? 'flex' : 'none';
+                });
+            }
+        }
+        
+        // 筛选暂停列表
+        function filterPauseList(type) {
+            // 更新筛选按钮状态
+            const options = document.querySelectorAll('#pauseFilter .filter-item');
+            options.forEach(option => {
+                option.classList.remove('active');
+                if (option.textContent.includes(type === 'all' ? '全部' : '正常服务')) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // 筛选列表项
+            const items = document.querySelectorAll('.pause-item');
+            items.forEach(item => {
+                if (type === 'all' || item.dataset.type === type) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // 筛选转出列表
+        function filterTransferList(type) {
+            // 更新筛选按钮状态
+            const options = document.querySelectorAll('#transferFilter .filter-item');
+            options.forEach(option => {
+                option.classList.remove('active');
+                if (option.textContent.includes(type === 'all' ? '全部' : 
+                    (type === 'normal' ? '正常服务' : '暂停服务'))) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // 筛选列表项
+            const items = document.querySelectorAll('.transfer-item');
+            items.forEach(item => {
+                if (type === 'all' || item.dataset.type === type) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // 打开导航
+        function openChangeNavigation(address) {
+            if (!address) {
+                showToast('地址信息不完整');
+                return;
+            }
+            
+            const amapUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(address)}&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1`;
+            const amapLink = document.createElement('a');
+            amapLink.href = amapUrl;
+            amapLink.target = '_blank';
+            amapLink.click();
+            
+            setTimeout(() => {
+                const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(address)}&mode=driving&region=全国&output=html&src=webapp`;
+                window.open(baiduUrl, '_blank');
+            }, 500);
+            
+            showToast(`正在打开地图导航...`);
+        }
+        
+        // 打开暂停信息查看
+        function openPauseForm(name, idCard, level, address, phone) {
+            currentUser.name = name;
+            currentUser.idCard = idCard;
+            currentUser.level = level;
+            currentUser.address = address || '';
+            currentUser.phone = phone || '';
+            
+            // 更新页面信息
+            document.getElementById('pauseUserName').textContent = name;
+            document.getElementById('pauseLevel').textContent = level;
+            
+            // 更新电话和地址
+            const pausePhoneElement = document.getElementById('pausePhone');
+            const pausePhoneLink = document.getElementById('pausePhoneLink');
+            if (phone) {
+                pausePhoneElement.querySelector('span').textContent = phone;
+                pausePhoneLink.href = `tel:${phone}`;
+                pausePhoneElement.style.display = 'flex';
+            } else {
+                pausePhoneElement.style.display = 'none';
+            }
+            
+            const pauseAddressElement = document.getElementById('pauseAddress');
+            if (address) {
+                pauseAddressElement.querySelector('span').textContent = address;
+                pauseAddressElement.style.display = 'flex';
+            } else {
+                pauseAddressElement.style.display = 'none';
+            }
+            
+            // 切换页面
+            document.getElementById('pauseListPage').style.display = 'none';
+            document.getElementById('pauseFormPage').classList.add('active');
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('pauseBtnBar').style.display = 'none';
+        }
+        
+        // 关闭暂停表单
+        function closePauseForm() {
+            document.getElementById('pauseFormPage').classList.remove('active');
+            document.getElementById('pauseListPage').style.display = 'block';
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('pauseBtnBar').style.display = 'none';
+        }
+        
+        // 打开转出表单
+        function openTransferForm(name, idCard, level, address, phone) {
+            currentUser.name = name;
+            currentUser.idCard = idCard;
+            currentUser.level = level;
+            currentUser.address = address || '';
+            currentUser.phone = phone || '';
+            
+            // 重置上传文件
+            uploadedFiles.transferOrder = [];
+            
+            // 更新页面信息
+            document.getElementById('transferUserName').textContent = name;
+            document.getElementById('transferLevel').textContent = level;
+            
+            // 更新电话和地址
+            const transferPhoneElement = document.getElementById('transferPhone');
+            const transferPhoneLink = document.getElementById('transferPhoneLink');
+            if (phone) {
+                transferPhoneElement.querySelector('span').textContent = phone;
+                transferPhoneLink.href = `tel:${phone}`;
+                transferPhoneElement.style.display = 'flex';
+            } else {
+                transferPhoneElement.style.display = 'none';
+            }
+            
+            const transferAddressElement = document.getElementById('transferCurrentAddress');
+            if (address) {
+                transferAddressElement.querySelector('span').textContent = address;
+                transferAddressElement.style.display = 'flex';
+            } else {
+                transferAddressElement.style.display = 'none';
+            }
+            
+            document.getElementById('transferOrderPreview').innerHTML = '';
+            
+            // 切换页面
+            document.getElementById('transferListPage').style.display = 'none';
+            document.getElementById('transferFormPage').classList.add('active');
+            document.getElementById('listBtnBar').style.display = 'none';
+            document.getElementById('transferBtnBar').style.display = 'flex';
+        }
+        
+        // 关闭转出表单
+        function closeTransferForm() {
+            document.getElementById('transferFormPage').classList.remove('active');
+            document.getElementById('transferListPage').style.display = 'block';
+            document.getElementById('listBtnBar').style.display = 'flex';
+            document.getElementById('transferBtnBar').style.display = 'none';
+        }
+        
+        // 选择图片
+        function selectImage(type) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (files.length === 0) return;
+                
+                // 处理选中的图片
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const fileId = Date.now() + i;
+                        const today = new Date();
+                        const dateStr = today.getFullYear() + (today.getMonth() + 1) + today.getDate();
+                        const fileName = `${dateStr}_${currentUser.name}_${type === 'pauseOrder' ? '暂停单' : '转出单'}.jpg`;
+                        
+                        // 保存文件信息
+                        uploadedFiles[type].push({
+                            id: fileId,
+                            url: event.target.result,
+                            name: fileName
+                        });
+                        
+                        // 更新预览
+                        renderPreview(type);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        // 渲染预览
+        function renderPreview(type) {
+            const container = document.getElementById(type + 'Preview');
+            container.innerHTML = '';
+            
+            uploadedFiles[type].forEach(file => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${file.url}" class="preview-img">
+                    <div class="preview-delete" onclick="deleteImage('${type}', ${file.id})">×</div>
+                `;
+                container.appendChild(previewItem);
+            });
+        }
+        
+        // 删除图片
+        function deleteImage(type, id) {
+            uploadedFiles[type] = uploadedFiles[type].filter(file => file.id !== id);
+            renderPreview(type);
+        }
+        
+        // 提交暂停申请
+        function submitPause() {
+            const startDate = document.getElementById('pauseStartDate').value;
+            const pauseType = document.getElementById('pauseType').value;
+            const reasonType = document.getElementById('pauseReasonType').value;
+            
+            // 验证必填项
+            if (!startDate) {
+                showToast('请选择暂停开始日期');
+                return;
+            }
+            
+            if (!pauseType) {
+                showToast('请选择暂停类型');
+                return;
+            }
+            
+            if (!reasonType) {
+                showToast('请选择暂停原因类型');
+                return;
+            }
+            
+            // 验证暂停单上传
+            if (uploadedFiles.pauseOrder.length === 0) {
+                showToast('请上传暂停单照片');
+                return;
+            }
+            
+            // 显示确认弹窗
+            document.getElementById('confirmTitle').textContent = '确认提交暂停申请';
+            document.getElementById('confirmMessage').textContent = '确认提交暂停申请？提交后将进入审批流程。';
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        // 提交转出申请
+        function submitTransfer() {
+            const transferDate = document.getElementById('transferDate').value;
+            const transferAddress = document.getElementById('transferAddress').value;
+            const transferContact = document.getElementById('transferContact').value;
+            const transferAgency = document.getElementById('transferAgency').value;
+            const careType = document.getElementById('careType').value;
+            
+            // 验证必填项
+            if (!transferDate) {
+                showToast('请选择转出日期');
+                return;
+            }
+            
+            if (!transferAddress.trim()) {
+                showToast('请填写转出居住地址');
+                return;
+            }
+            
+            if (!transferContact.trim()) {
+                showToast('请填写联系人及电话');
+                return;
+            }
+            
+            if (!transferAgency.trim()) {
+                showToast('请填写转出地机构名称');
+                return;
+            }
+            
+            if (!careType) {
+                showToast('请选择护理类型');
+                return;
+            }
+            
+            // 验证转出单上传
+            if (uploadedFiles.transferOrder.length === 0) {
+                showToast('请上传转出单照片');
+                return;
+            }
+            
+            // 显示确认弹窗
+            document.getElementById('confirmTitle').textContent = '确认提交转出申请';
+            document.getElementById('confirmMessage').textContent = '确认提交转出申请？提交后将进行档案转移流程。';
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        // 确认提交
+        function confirmSubmit() {
+            hideConfirm();
+            
+            if (currentType === 'pause') {
+                document.getElementById('successMessage').textContent = '暂停申请已提交，电子档案生成成功\n请将暂停单原件提交至医保窗口存档';
+            } else {
+                document.getElementById('successMessage').textContent = '转出申请已提交，电子档案正在转移\n同平台机构将自动接收档案，其他机构请导出档案传递';
+            }
+            
+            // 显示成功弹窗
+            document.getElementById('successModal').classList.add('show');
+        }
+        
+        // 完成提交
+        function completeSubmit() {
+            document.getElementById('successModal').classList.remove('show');
+            
+            if (currentType === 'pause') {
+                closePauseForm();
+                showToast('暂停申请已提交');
+            } else {
+                closeTransferForm();
+                showToast('转出申请已提交');
+            }
+            
+            // 实际项目中这里会提交数据到服务器
+        }
+        
+        // 隐藏确认弹窗
+        function hideConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+        
+        // 返回主页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // 从表单页面打开导航
+        function openChangeNavigationFromForm() {
+            if (currentUser.address) {
+                openChangeNavigation(currentUser.address);
+            } else {
+                showToast('地址信息不完整');
+            }
+        }
+        
+        // 显示提示框
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

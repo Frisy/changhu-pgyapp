@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>居家长护协助申请系统 - 首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2f80ed;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --danger-color: #ff4d4f;
+            --text-color: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --bg-color: #f5f7fa;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-size: 14px;
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+        
+        /* 顶部状态栏 */
+        .status-bar {
+            height: 20px;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+            color: #000;
+        }
+        
+        .status-left {
+            font-weight: 600;
+        }
+        
+        .status-right {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .status-icon {
+            width: 16px;
+            height: 16px;
+            background-color: #000;
+            border-radius: 2px;
+        }
+        
+        /* 顶部导航栏 */
+        .nav-bar {
+            height: 44px;
+            line-height: 44px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-right {
+            position: absolute;
+            right: 15px;
+            font-size: 14px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* 通知铃铛图标 */
+        .notification-icon {
+            position: relative;
+            font-size: 20px;
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background: #ff4d4f;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 11px;
+            text-align: center;
+            line-height: 18px;
+            font-weight: 600;
+            border: 2px solid var(--primary-color);
+        }
+        
+        /* 待完成工作弹窗 */
+        .work-reminder-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .work-reminder-modal.show {
+            display: flex;
+        }
+        
+        .work-reminder-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 400px;
+            max-height: 70vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .work-reminder-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .work-reminder-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .work-reminder-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .work-reminder-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .work-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .work-item:last-child {
+            border-bottom: none;
+        }
+        
+        .work-item-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        
+        .work-item-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .work-item-count {
+            display: inline-block;
+            background: #ff4d4f;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        .work-reminder-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .work-reminder-btn {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 10px 40px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        /* 角色切换下拉菜单（APP端） */
+        .role-switch-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+        .role-switch-dropdown.show {
+            display: block;
+        }
+        .role-switch-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .role-switch-item:last-child {
+            border-bottom: none;
+        }
+        .role-switch-item:active {
+            background-color: #f0f7ff;
+        }
+        .role-switch-item.active {
+            background-color: #e6f7ff;
+            color: #2f80ed;
+        }
+        .role-switch-item .role-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        .role-switch-item.active .role-icon {
+            background: #2f80ed;
+            color: #fff;
+        }
+        .role-switch-item .role-name {
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        /* 内容容器 */
+        .content {
+            padding: 0;
+        }
+        
+        /* 欢迎区域 */
+        .welcome-card {
+            background-color: #fff;
+            padding: 20px 15px;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-text {
+            flex: 1;
+        }
+        
+        .welcome-greeting {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        
+        .welcome-task {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .evaluate-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #87ceeb;
+            color: #fff;
+            border: none;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+        
+        /* 功能卡片网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .feature-card:active {
+            transform: scale(0.98);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .feature-icon.blue {
+            background-color: #87ceeb;
+        }
+        
+        .feature-icon.green {
+            background-color: #90ee90;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+        
+        .feature-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        /* 今日待协助申请区域 */
+        .pending-section {
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .view-all-link {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .pending-list {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .pending-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .pending-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pending-item:active {
+            background-color: #f5f5f5;
+        }
+        
+        .pending-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--danger-color);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .pending-content {
+            flex: 1;
+        }
+        
+        .pending-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+        
+        .pending-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .pending-time {
+            margin-right: 8px;
+        }
+        
+        .pending-status {
+            color: var(--primary-color);
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-tertiary);
+            font-size: 11px;
+            padding: 4px 2px;
+            transition: color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-item:active {
+            opacity: 0.7;
+        }
+        
+        .nav-icon {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 2px;
+            background-color: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        .nav-icon.home {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/%3E%3C/svg%3E");
+        }
+        
+        .nav-icon.leads {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'/%3E%3C/svg%3E");
+        }
+        
+        .nav-icon.leads {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'/%3E%3C/svg%3E");
+        }
+        
+        .nav-icon.register {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");
+        }
+        
+        .nav-icon.visit {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E");
+        }
+        
+        .nav-icon.profile {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">9:41</div>
+        <div class="status-right">
+            <div class="status-icon"></div>
+            <div class="status-icon"></div>
+            <div class="status-icon"></div>
+        </div>
+    </div>
+    
+    <!-- 顶部导航栏 -->
+    <div class="nav-bar">
+        居家长护协助申请系统
+        <div class="nav-right">
+            <div class="notification-icon" id="notificationIcon" onclick="showWorkReminder()">
+                <i class="fa fa-bell-o"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </div>
+            <div id="roleSwitchBtn">切换
+                <!-- 角色切换下拉菜单 -->
+                <div class="role-switch-dropdown" id="roleSwitchDropdown">
+                <div class="role-switch-item" data-role="admin" data-path="../系统管理员/index.html">
+                    <div class="role-icon">管</div>
+                    <div class="role-name">系统管理员</div>
+                </div>
+                <div class="role-switch-item" data-role="director" data-path="../机构负责人/index.html">
+                    <div class="role-icon">负</div>
+                    <div class="role-name">机构负责人</div>
+                </div>
+                <div class="role-switch-item" data-role="supervisor" data-path="../服务主管/index.html">
+                    <div class="role-icon">主</div>
+                    <div class="role-name">服务主管</div>
+                </div>
+                <div class="role-switch-item" data-role="archivist" data-path="../档案管理员.html/index.html">
+                    <div class="role-icon">档</div>
+                    <div class="role-name">档案管理员</div>
+                </div>
+                <div class="role-switch-item active" data-role="evaluator" data-path="index.html">
+                    <div class="role-icon">助</div>
+                    <div class="role-name">协助申请员</div>
+                </div>
+                <div class="role-switch-item" data-role="scheduler" data-path="../排单员/index.html">
+                    <div class="role-icon">排</div>
+                    <div class="role-name">排单员</div>
+                </div>
+                <div class="role-switch-item" data-role="adminApp" data-path="../管理员APP/index.html">
+                    <div class="role-icon">管</div>
+                    <div class="role-name">管理员APP</div>
+                </div>
+                <div class="role-switch-item" data-role="evaluatorApp" data-path="index.html">
+                    <div class="role-icon">助</div>
+                    <div class="role-name">协助申请员APP</div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 待完成工作提醒弹窗 -->
+    <div class="work-reminder-modal" id="workReminderModal">
+        <div class="work-reminder-content">
+            <div class="work-reminder-header">
+                <div class="work-reminder-title">今日待完成工作</div>
+                <div class="work-reminder-close" onclick="closeWorkReminder()">×</div>
+            </div>
+            <div class="work-reminder-body" id="workReminderBody">
+                <!-- 工作列表将通过JS动态生成 -->
+            </div>
+            <div class="work-reminder-footer">
+                <button class="work-reminder-btn" onclick="closeWorkReminder()">我知道了</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 欢迎区域 -->
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <div class="welcome-text">
+                    <div class="welcome-greeting">你好, 协助申请员001</div>
+                    <div class="welcome-task">今日可协助申请任务: 5个</div>
+                </div>
+                <button class="evaluate-btn" onclick="handleEvaluate()">评</button>
+            </div>
+        </div>
+        
+        <!-- 功能卡片网格 -->
+        <div class="feature-grid">
+            <div class="feature-card" onclick="navigateTo('评估线索查询.html')">
+                <div class="feature-icon blue">线</div>
+                <div class="feature-title">待协助申请线索</div>
+                <div class="feature-subtitle">待处理协助申请任务</div>
+            </div>
+            
+            <div class="feature-card" onclick="navigateTo('登记功能.html')">
+                <div class="feature-icon green">评</div>
+                <div class="feature-title">上门协助申请操作</div>
+                <div class="feature-subtitle">线下协助申请信息录入</div>
+            </div>
+            
+            <div class="feature-card" onclick="navigateTo('结论书送达.html')">
+                <div class="feature-icon blue">结</div>
+                <div class="feature-title">结论书送达</div>
+                <div class="feature-subtitle">协助申请结论书送达</div>
+            </div>
+            
+            <div class="feature-card" onclick="navigateTo('暂停单和转出单.html')">
+                <div class="feature-icon blue">转</div>
+                <div class="feature-title">暂停单和转出单</div>
+                <div class="feature-subtitle">暂停单和转出单签署</div>
+            </div>
+            
+            <div class="feature-card" onclick="navigateTo('回访功能.html')">
+                <div class="feature-icon blue">访</div>
+                <div class="feature-title">回访功能</div>
+                <div class="feature-subtitle">线上线下回访执行</div>
+            </div>
+        </div>
+        
+        <!-- 今日待协助申请 -->
+        <div class="pending-section">
+            <div class="section-header">
+                <div class="section-title">今日待协助申请</div>
+                <a href="评估线索查询.html" class="view-all-link">查看全部</a>
+            </div>
+            
+            <div class="pending-list">
+                <div class="pending-item" onclick="viewDetail('张三')">
+                    <div class="pending-dot"></div>
+                    <div class="pending-content">
+                        <div class="pending-name">张三 - 幸福社区</div>
+                        <div class="pending-info">
+                            <span class="pending-time">上午9:30-11:30</span>
+                            <span class="pending-status">| 待上门</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pending-item" onclick="viewDetail('李四')">
+                    <div class="pending-dot"></div>
+                    <div class="pending-content">
+                        <div class="pending-name">李四 - 平安村镇</div>
+                        <div class="pending-info">
+                            <span class="pending-time">下午2:00-4:00</span>
+                            <span class="pending-status">| 待上门</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pending-item" onclick="viewDetail('王五')">
+                    <div class="pending-dot"></div>
+                    <div class="pending-content">
+                        <div class="pending-name">王五 - 和谐小区</div>
+                        <div class="pending-info">
+                            <span class="pending-time">下午4:30-6:30</span>
+                            <span class="pending-status">| 待上门</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <div class="nav-icon home"></div>
+            <span>首页</span>
+        </a>
+        <a href="评估线索查询.html" class="nav-item">
+            <div class="nav-icon leads"></div>
+            <span>线索</span>
+        </a>
+        <a href="登记功能.html" class="nav-item">
+            <div class="nav-icon register"></div>
+            <span>登记</span>
+        </a>
+        <a href="回访功能.html" class="nav-item">
+            <div class="nav-icon visit"></div>
+            <span>回访</span>
+        </a>
+    </div>
+    
+    <script>
+        // ========== 角色切换功能 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSwitchBtn = document.getElementById('roleSwitchBtn');
+            if (roleSwitchBtn) {
+                roleSwitchBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = document.getElementById('roleSwitchDropdown');
+                    if (dropdown) {
+                        dropdown.classList.toggle('show');
+                    }
+                });
+            }
+
+            // 点击页面其他地方关闭下拉菜单
+            document.addEventListener('click', function(e) {
+                const roleSwitchBtn = document.getElementById('roleSwitchBtn');
+                if (roleSwitchBtn && !roleSwitchBtn.contains(e.target)) {
+                    const dropdown = document.getElementById('roleSwitchDropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            });
+
+            // 角色切换
+            document.querySelectorAll('.role-switch-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const rolePath = this.getAttribute('data-path');
+                    if (rolePath) {
+                        window.location.href = rolePath;
+                    }
+                });
+            });
+        });
+
+        // 导航功能
+        function navigateTo(url) {
+            if (url.includes('.html')) {
+                window.location.href = url;
+            } else {
+                alert(url + ' 功能开发中');
+            }
+        }
+        
+        // 根据当前页面高亮对应的导航项
+        (function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href && (href === currentPage || (currentPage === 'index.html' && href === 'index.html'))) {
+                    item.classList.add('active');
+                } else if (href && currentPage.includes(href.replace('.html', ''))) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        })();
+        
+        // 协助申请按钮点击
+        function handleEvaluate() {
+            window.location.href = '登记功能.html';
+        }
+        
+        // 查看详情
+        function viewDetail(name) {
+            window.location.href = '评估线索查询.html';
+        }
+        
+        // 待完成工作数据
+        const pendingWorks = [
+            {
+                title: '待协助申请线索',
+                desc: '您有5条待处理的协助申请线索需要处理',
+                count: 5,
+                link: '评估线索查询.html'
+            },
+            {
+                title: '待回访任务',
+                desc: '您有3个服务对象需要今日完成回访',
+                count: 3,
+                link: '回访功能.html'
+            },
+            {
+                title: '待送达结论书',
+                desc: '您有2份结论书需要今日送达',
+                count: 2,
+                link: '结论书送达.html'
+            }
+        ];
+        
+        // 更新通知徽章
+        function updateNotificationBadge() {
+            const totalCount = pendingWorks.reduce((sum, work) => sum + work.count, 0);
+            const badge = document.getElementById('notificationBadge');
+            if (totalCount > 0) {
+                badge.textContent = totalCount > 99 ? '99+' : totalCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        // 渲染待完成工作列表
+        function renderPendingWorks() {
+            const body = document.getElementById('workReminderBody');
+            body.innerHTML = '';
+            
+            if (pendingWorks.length === 0) {
+                body.innerHTML = '<div style="text-align: center; padding: 40px 0; color: #999;">暂无待完成工作</div>';
+                return;
+            }
+            
+            pendingWorks.forEach(work => {
+                const item = document.createElement('div');
+                item.className = 'work-item';
+                item.onclick = () => {
+                    if (work.link) {
+                        window.location.href = work.link;
+                    }
+                };
+                item.style.cursor = work.link ? 'pointer' : 'default';
+                item.innerHTML = `
+                    <div class="work-item-title">
+                        ${work.title}
+                        ${work.count > 0 ? `<span class="work-item-count">${work.count}</span>` : ''}
+                    </div>
+                    <div class="work-item-desc">${work.desc}</div>
+                `;
+                body.appendChild(item);
+            });
+        }
+        
+        // 显示待完成工作提醒
+        function showWorkReminder() {
+            renderPendingWorks();
+            const modal = document.getElementById('workReminderModal');
+            modal.classList.add('show');
+        }
+        
+        // 关闭待完成工作提醒
+        function closeWorkReminder() {
+            const modal = document.getElementById('workReminderModal');
+            modal.classList.remove('show');
+        }
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            updateNotificationBadge();
+            renderPendingWorks();
+            
+            // 每次进入页面都显示弹窗（如果有待完成工作）
+            if (pendingWorks.length > 0) {
+                setTimeout(() => {
+                    showWorkReminder();
+                }, 500);
+            }
+            
+            // 点击弹窗外部关闭
+            document.getElementById('workReminderModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeWorkReminder();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+
+
